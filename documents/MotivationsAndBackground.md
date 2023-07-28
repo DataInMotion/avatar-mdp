@@ -17,7 +17,10 @@ pandoc-latex-environment:
 
 ### The "How"
 
+Two main use-cases can be identified:
+
 + Given a process (that we can always think in terms of a model), provide warnings on fields and/or combination of fields that might constitute a privacy risk, or that might have to be complaint with some data transparency standards.
++ Given an instance of a process, we would need to check whether the actual data is GDPR compliant, and, in case is not, prevent from sending information to the outside world.
 
 ### But first...
 
@@ -39,7 +42,7 @@ pandoc-latex-environment:
 
 ::: {.block title="Personal Data"} 
 
-Personal data is any information that relates to an individual who can  be directly or indirectly identified. Names and email addresses are obviously personal data. Location information, ethnicity, gender,  biometric data, religious beliefs, web cookies, and political opinions can also be personal data. Pseudonymous data can also fall under the definition if it’s relatively easy to ID someone from it.
+Personal data is any information that relates to an individual who can  be directly or indirectly identified. Names and email addresses are obviously personal data. Location information, ethnicity, gender,  biometric data, religious beliefs, web cookies, and political opinions can also be personal data. Pseudonymous data can also fall under the definition if it’s in someway possible to ID someone from it.
 
 :::
 
@@ -63,7 +66,7 @@ The person whose data is processed.
 
 ::: {.block title="Data Controller"} 
 
-The person who decides why and how personal data will be processed. If  you’re an owner or employee in your organization who handles data, this  is you.
+The person who decides why and how personal data will be processed. If  you’re an owner of an organization, this  is you.
 
 :::
 

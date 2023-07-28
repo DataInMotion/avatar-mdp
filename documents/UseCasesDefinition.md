@@ -11,6 +11,8 @@ pandoc-latex-environment:
 
 ### Use Cases Definition
 
+\lstset{language=java, style=code-inline}
+
 Two main use-cases can be identified:
 
 1. Given a meta-model (e.g. `person.ecore`) provide warnings and suggestions on fields and/or combination of fields that might constitute a privacy risk under a certain regulation (e.g. GDPR) or that have to obey to certain open data standards;
