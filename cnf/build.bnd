@@ -1,0 +1,69 @@
+Bundle-DocURL: https://github.com/DataInMotion/avatar-mdp
+Bundle-SCM: url=https://github.com/DataInMotion/avatar-mdp, \
+	connection=scm:git:git@github.com:DataInMotion/avatar-mdp.git, \
+	developerConnection=scm:git:git@github.com:DataInMotion/avatar-mdp.git
+
+
+Bundle-Developers: \
+    jalbert; \
+        email="j.albert@data-in-motion.biz"; \
+        name="Juergen Albert"; \
+        organization="Data In Motion"; \
+        organizationUrl="https://www.datainmotion.de"; \
+        roles="architect,developer", \
+    mhoffmann; \
+        name="Mark Hoffmann"; \
+        email="m.hoffmann@data-in-motion.biz"; \
+        url="https://www.datainmotion.de"; \
+        organization="Data In Motion"; \
+        organizationUrl="https://www.datainmotion.de"; \
+        roles="developer,architect"
+
+# We include setups for
+#	OSGi-Test Support - gecko-osgitest
+#	DIMC Github-Configuration - gecko-dimc
+#	Jacoco Support - gecko-jacoco
+-library: \
+	geckoDIMC,\
+	geckoOSGi-Test,\
+	geckoJacoco,\
+	geckoEMF,\
+	geckoEMFUtil
+	
+
+# Needed because we enabled library 'gecko-dimc'
+# Activate baselining
+#dimcBaselining: true
+github-project: DataInMotion/avatar-mdp
+base-version: 1.0.0.SNAPSHOT
+
+# Maven Central Group-Id
+# For Geckoprojects the groupid must start with org.geckoprojects
+-groupid: de.avatar.mdp
+
+javac.source: 17
+javac.target: 17
+
+-require-bnd "(version>=6.4.0)"
+
+-fixupmessages: \
+	"No metadata for revision";\
+		restrict:=error;\
+    	is:=warning
+
+-snapshot: ${tstamp}-SNAPSHOT
+-pom: version=${versionmask;===s;${@version}}	
+# Find out if the current Bundle Version is already deployed in any repository (excluding the Workspace)
+releaseNotNeeded: ${findproviders;osgi.identity;(&(osgi.identity=${bsn})(version=${avatar-mdp-version}));REPOS}
+
+# If release not needed is empty, no Bundle has been found and for maven we do a release to the remote Repo. If not, we only do a release to the local .m2 Repo
+-maven-release.local: ${if;${def;releaseNotNeeded};local;remote}
+
+        
+-plugin.0.Local: \
+	aQute.bnd.deployer.repository.LocalIndexedRepo; \
+		name = Local; \
+		pretty = true; \
+		overwrite = true;\
+		local = ${.}/local
+		

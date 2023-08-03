@@ -1,0 +1,10 @@
+-library: enable-emf
+
+Bundle-Version: 1.0.0.SNAPSHOT
+Private-Package: de.avatar.mdp.evaluation.component
+-buildpath: \
+	de.avatar.mdp.apis;version=latest,\
+	de.avatar.mdp.evaluation.model;version=latest,\
+	com.fasterxml.jackson.core.jackson-databind,\
+	com.fasterxml.jackson.core.jackson-core
+-privatepackage: de.avatar.mdp.evaluation.component.helper

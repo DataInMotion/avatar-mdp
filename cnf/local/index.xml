@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<repository xmlns="http://www.osgi.org/xmlns/repository/v1.0.0" name="Local" increment="1690893412988">
+  <resource>
+    <capability namespace="osgi.identity">
+      <attribute name="license" value="Eclipse Public License 2.0"/>
+      <attribute name="copyright" value="Data In Motion Consuling GmbH - All rights reserved"/>
+      <attribute name="osgi.identity" value="org.gecko.vaadin.bnd.library"/>
+      <attribute name="documentation" value="https://github.com/geckoprojects-org/org.gecko.vaadin"/>
+      <attribute name="description" value="Vaadin Dependencies for the Gecko Vaadin Whiteboard"/>
+      <attribute name="type" value="osgi.bundle"/>
+      <attribute name="version" value="2.0.0.202303101033-SNAPSHOT" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.bundle">
+      <attribute name="bundle-version" value="2.0.0.202303101033-SNAPSHOT" type="Version"/>
+      <attribute name="osgi.wiring.bundle" value="org.gecko.vaadin.bnd.library"/>
+    </capability>
+    <capability namespace="osgi.wiring.host">
+      <attribute name="bundle-version" value="2.0.0.202303101033-SNAPSHOT" type="Version"/>
+      <attribute name="osgi.wiring.host" value="org.gecko.vaadin.bnd.library"/>
+    </capability>
+    <capability namespace="bnd.library">
+      <attribute name="bnd.library" value="geckoVaadin"/>
+      <attribute name="path" value="library/workspace"/>
+    </capability>
+    <capability namespace="osgi.content">
+      <attribute name="size" value="10345" type="Long"/>
+      <attribute name="mime" value="application/vnd.osgi.bundle"/>
+      <attribute name="url" value="org.gecko.vaadin.bnd.library/org.gecko.vaadin.bnd.library-2.0.0.jar"/>
+      <attribute name="osgi.content" value="50B788C5F243900421C98AEDEF55686156F4072A069114B1FBDB42EC104D433F"/>
+    </capability>
+  </resource>
+  <resource>
+    <capability namespace="osgi.identity">
+      <attribute name="license" value="Eclipse Public License 2.0"/>
+      <attribute name="copyright" value="Data In Motion Consuling GmbH - All rights reserved"/>
+      <attribute name="osgi.identity" value="org.gecko.vaadin.bnd.project.library"/>
+      <attribute name="documentation" value="https://github.com/geckoprojects-org/org.gecko.vaadin"/>
+      <attribute name="type" value="osgi.bundle"/>
+      <attribute name="version" value="2.0.0.SNAPSHOTSNAPSHOT" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.bundle">
+      <attribute name="bundle-version" value="2.0.0.SNAPSHOTSNAPSHOT" type="Version"/>
+      <attribute name="osgi.wiring.bundle" value="org.gecko.vaadin.bnd.project.library"/>
+    </capability>
+    <capability namespace="osgi.wiring.host">
+      <attribute name="bundle-version" value="2.0.0.SNAPSHOTSNAPSHOT" type="Version"/>
+      <attribute name="osgi.wiring.host" value="org.gecko.vaadin.bnd.project.library"/>
+    </capability>
+    <capability namespace="bnd.library">
+      <attribute name="bnd.library" value="enableVaadin"/>
+      <attribute name="path" value="library"/>
+    </capability>
+    <capability namespace="org.bndtools.template">
+      <attribute name="help" value="vaadin.xml"/>
+      <attribute name="engine" value="mustache"/>
+      <attribute name="name" value="Gecko Vaadin Example"/>
+      <attribute name="icon" value="data:image/gif;base64,AAABAAIAEBAAAAEAIABoBAAAJgAAABAQAgABAAEAsAAAAI4EAAAoAAAAEAAAACAAAAABACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAECY+AAAAAAAaP2dbG0BqeRk8ZHsaPWWNAAAAJQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgTH6PI1aMFAAAAAAAAAAAAAAAACNTinIPIzlVAAAAAAAAAAAAAAAAAAAAAAAAAAAONx85AAAAABRUKykfSHp8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIEp7fwAAAA0AAAAAAAAAAAAAAAAXWTNZGF02uA45IUAWXC1ZHURxdSWUVhgQQCV1CSYVMQAAAAAAAAAZAAAACShfnTcOIzlDAAAAAAAAAAAhfkkAAAAAABtqPYgXXDSaGjtmTw4cPzQZYDejGmk82gMPBigbWE6qHG48jQAAAAcoXpseGT1kXAAAAAAAAAAAAAAAAAAAAAAAAAAAFlYxTyhboz0BAwgpHXJBVhJHKEgAAAAAGUNclwAAAAAAAAAAIU+BaAAAAAoAAAAAAAAAAAAAAAAAAAAAAAAAABVRL2YrZKY0DR8zPyebWRcMMRxDAAAAACJSiU8ZPGOSHUVyhh9LfEEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATTCteAAAAABg5X34AAAAAE0srYAAAAAAAAAAAAAAAAAAAAACH//8AAAAAAAAAAAAAAAAAAAAAAAAAAAAigEoAGmc8SQAAAAgaQGqFAAAAABJJKVMGGw8qFVIvqAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACulXwoQPSNfKWGfQwkXJkYbajxpF102Ph50Qv4AAgIkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH3xHMgYfBUIgTH6NAAAAGwAAAAAppF8JAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjiE8lED4jcBo7aqQMLh5MEUYlYBlhOFgXXC5PEkknaQwwHD4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAF1kzbxNLK20WYCdJIk+HXRczYIQYOWFtHUJzeBZKPnUUUS8VAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIoJLACGCTD8XWzTGDjkhQAAAAAAcdjYzEUggWRVYLFsYXjYUSP+fAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhg0oaG2g8RAAAAAAAAAAAIVgiAAAAAAAAAAAAI4lOAAAAAAAAAAAAAAAAAP//AAD/3wAA/f8AAP//AADf/wAAzJ8AAP+/AAD/zwAA//8AAPu/AAD/vwAA/f8AAP7/AAD/vwAA/f8AAP//AAAoAAAAEAAAACAAAAABAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="/>
+      <attribute name="metaType" value="vaadin-metatype.xml"/>
+      <attribute name="ranking" value="1001.0" type="Double"/>
+      <attribute name="org.bndtools.template" value="project"/>
+      <attribute name="category" value="ccc/Gecko OSGi Standard Templates"/>
+      <attribute name="dir" value="templates/vaadin"/>
+    </capability>
+    <capability namespace="org.bndtools.template">
+      <attribute name="help" value="vaadin-frontend.xml"/>
+      <attribute name="engine" value="mustache"/>
+      <attribute name="name" value="Gecko Vaadin Frontend Example"/>
+      <attribute name="icon" value="data:image/gif;base64,AAABAAIAEBAAAAEAIABoBAAAJgAAABAQAgABAAEAsAAAAI4EAAAoAAAAEAAAACAAAAABACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAECY+AAAAAAAaP2dbG0BqeRk8ZHsaPWWNAAAAJQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgTH6PI1aMFAAAAAAAAAAAAAAAACNTinIPIzlVAAAAAAAAAAAAAAAAAAAAAAAAAAAONx85AAAAABRUKykfSHp8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIEp7fwAAAA0AAAAAAAAAAAAAAAAXWTNZGF02uA45IUAWXC1ZHURxdSWUVhgQQCV1CSYVMQAAAAAAAAAZAAAACShfnTcOIzlDAAAAAAAAAAAhfkkAAAAAABtqPYgXXDSaGjtmTw4cPzQZYDejGmk82gMPBigbWE6qHG48jQAAAAcoXpseGT1kXAAAAAAAAAAAAAAAAAAAAAAAAAAAFlYxTyhboz0BAwgpHXJBVhJHKEgAAAAAGUNclwAAAAAAAAAAIU+BaAAAAAoAAAAAAAAAAAAAAAAAAAAAAAAAABVRL2YrZKY0DR8zPyebWRcMMRxDAAAAACJSiU8ZPGOSHUVyhh9LfEEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATTCteAAAAABg5X34AAAAAE0srYAAAAAAAAAAAAAAAAAAAAACH//8AAAAAAAAAAAAAAAAAAAAAAAAAAAAigEoAGmc8SQAAAAgaQGqFAAAAABJJKVMGGw8qFVIvqAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACulXwoQPSNfKWGfQwkXJkYbajxpF102Ph50Qv4AAgIkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH3xHMgYfBUIgTH6NAAAAGwAAAAAppF8JAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjiE8lED4jcBo7aqQMLh5MEUYlYBlhOFgXXC5PEkknaQwwHD4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAF1kzbxNLK20WYCdJIk+HXRczYIQYOWFtHUJzeBZKPnUUUS8VAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIoJLACGCTD8XWzTGDjkhQAAAAAAcdjYzEUggWRVYLFsYXjYUSP+fAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhg0oaG2g8RAAAAAAAAAAAIVgiAAAAAAAAAAAAI4lOAAAAAAAAAAAAAAAAAP//AAD/3wAA/f8AAP//AADf/wAAzJ8AAP+/AAD/zwAA//8AAPu/AAD/vwAA/f8AAP7/AAD/vwAA/f8AAP//AAAoAAAAEAAAACAAAAABAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="/>
+      <attribute name="metaType" value="vaadin-frontend-metatype.xml"/>
+      <attribute name="ranking" value="1001.0" type="Double"/>
+      <attribute name="org.bndtools.template" value="project"/>
+      <attribute name="category" value="ccc/Gecko OSGi Standard Templates"/>
+      <attribute name="dir" value="templates/vaadin-frontend"/>
+    </capability>
+    <capability namespace="osgi.content">
+      <attribute name="size" value="61760" type="Long"/>
+      <attribute name="mime" value="application/vnd.osgi.bundle"/>
+      <attribute name="url" value="org.gecko.vaadin.bnd.project.library/org.gecko.vaadin.bnd.project.library-2.0.0.jar"/>
+      <attribute name="osgi.content" value="030E66B908B830D08624C868EC1CFC139BEE2C5F9DDC4DFF96E6CAE96C8CD71A"/>
+    </capability>
+  </resource>
+</repository>
