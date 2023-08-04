@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="prmeta" nsURI="http://avatar.de/mdp/privacyrelatedmeta/1.0.0"
+    nsPrefix="prmeta">
+  <eAnnotations source="Version">
+    <details key="value" value="1.0.0"/>
+  </eAnnotations>
+  <eClassifiers xsi:type="ecore:EClass" name="PRModel">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="packageURI" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="prPackage" upperBound="-1"
+        eType="#//PRPackage" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="PRPackage">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="ePackage" eType="ecore:EClass ../../org.eclipse.emf.ecore/model/Ecore.ecore#//EPackage"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="evaluationCriterium" eType="#//EvaluationCriteriumType"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="prClass" upperBound="-1"
+        eType="#//PRClass" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="PRClass">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="eClass" eType="ecore:EClass ../../org.eclipse.emf.ecore/model/Ecore.ecore#//EClass"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="evaluationLevel" eType="#//EvaluationLevelType"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="prFeature" upperBound="-1"
+        eType="#//PRFeature" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="PRFeature">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="feature" eType="ecore:EClass ../../org.eclipse.emf.ecore/model/Ecore.ecore#//EStructuralFeature"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="evaluationLevel" eType="#//EvaluationLevelType"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="EvaluationCriteriumType">
+    <eLiterals name="GDPR"/>
+    <eLiterals name="OPEN_DATA" value="1"/>
+    <eLiterals name="OTHER" value="2"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="EvaluationLevelType">
+    <eLiterals name="NONE"/>
+    <eLiterals name="WARNING" value="1"/>
+    <eLiterals name="SEVERE" value="2"/>
+  </eClassifiers>
+</ecore:EPackage>
