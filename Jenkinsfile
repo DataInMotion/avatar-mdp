@@ -1,33 +1,57 @@
 pipeline  {
     agent any
+    
+    environment {
+		JAVA_OPTS = "-Xms2048m -Xmx2048m -XX:MaxMetaspaceSize=1024m ${sh(script:'echo $JAVA_OPTS', returnStdout: true).trim()}"	
+  	}
 
     tools {
         jdk 'OpenJDK17'
     }
     options {
         buildDiscarder(logRotator(numToKeepStr: '5'))
+        skipDefaultCheckout()
     }
 
     stages {
-        stage('Main branch release') {
-            when { 
-                branch 'main' 
-            }
+    
+        stage('Clean Workspace') {
             steps {
-                echo "I am building on ${env.BRANCH_NAME}"
-                sh "./gradlew clean build release -Drelease.dir=$JENKINS_HOME/repo.gecko/release/avatar.model-driven-privacy --info --stacktrace -Dmaven.repo.local=${WORKSPACE}/.m2"
+                // Cleanup before starting the stage
+                cleanWs()
             }
         }
-        stage('Snapshot branch release') {
-            when { 
-                branch 'snapshot'
+
+	stage('Checkout') {
+            steps {
+                // Checkout the repository
+                checkout scm 
+            }
+        }
+        
+	stage('App build') {
+	     steps {
+		echo "I am building app on branch: ${env.BRANCH_NAME}"
+	
+		sh "./gradlew clean build -x itest --info --stacktrace -Dmaven.repo.local=${WORKSPACE}/.m2"
+
+		}
+	}
+        
+        stage('Other branch') {
+            when {
+            	allOf {
+            		not {
+	                	branch 'snapshot'
+	            	}
+            		not {
+	                	branch 'main'
+	            	}
+            	}
             }
             steps  {
                 echo "I am building on ${env.JOB_NAME}"
-                sh "./gradlew clean release --info --stacktrace -Dmaven.repo.local=${WORKSPACE}/.m2"
-                sh "mkdir -p $JENKINS_HOME/repo.gecko/snapshot/avatar.model-driven-privacy"
-                sh "rm -rf $JENKINS_HOME/repo.gecko/snapshot/avatar.model-driven-privacy/*"
-                sh "cp -r cnf/release/* $JENKINS_HOME/repo.gecko/snapshot/avatar.model-driven-privacy"
+                sh "./gradlew build --info --stacktrace -Dmaven.repo.local=${WORKSPACE}/.m2"
             }
         }
     }
