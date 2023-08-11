@@ -33,7 +33,6 @@ com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.11.2
 io.github.classgraph:classgraph:4.6.32
 
 # Felix Deps
-org.apache.felix:org.apache.felix.configurator:1.0.8
 org.apache.felix:org.apache.felix.connect:0.2.0
 org.apache.felix:org.apache.felix.coordinator:1.0.2
 org.apache.felix:org.apache.felix.deploymentadmin:0.9.10
@@ -109,7 +108,7 @@ org.apache.servicemix.bundles:org.apache.servicemix.bundles.junit:jar:4.13.2_1
 org.junit.vintage:junit-vintage-engine:jar:5.7.2
 commons-logging:commons-logging:jar:1.2
 
-org.mongodb:mongo-java-driver:3.9.1
+org.mongodb:mongo-java-driver:3.12.0
 
 org.geckoprojects.emf.utils:org.gecko.emf.rest:2.0.0
 org.geckoprojects.emf.utils:org.gecko.emf.util.model:2.1.0

@@ -1,0 +1,12 @@
+{
+	"EMFMongoRepositoryConfigurator~avatarmdp": {
+		"mongo.instances": "avatarmdp",
+		"avatarmdp.baseUris": "mongodb://mongodb",
+		"avatarmdp.databases": "avatarmdp",
+		"avatarmdp.avatarmdp.repoType": "PROTOTYPE"
+	},
+	"GDPRModelEvaluator~test": {
+		"pyScriptBasePath": "./data/py/",
+		"outputBasePath": "./data/out/"
+	}
+}

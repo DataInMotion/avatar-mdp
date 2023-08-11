@@ -9,6 +9,7 @@
   <genPackages prefix="PRMeta" basePackage="de.avatar.mdp" disposableProviderFactory="true"
       ecorePackage="prmeta.ecore#/">
     <genEnums typeSafeEnumCompatible="false" ecoreEnum="prmeta.ecore#//EvaluationCriteriumType">
+      <genEnumLiterals ecoreEnumLiteral="prmeta.ecore#//EvaluationCriteriumType/NONE"/>
       <genEnumLiterals ecoreEnumLiteral="prmeta.ecore#//EvaluationCriteriumType/GDPR"/>
       <genEnumLiterals ecoreEnumLiteral="prmeta.ecore#//EvaluationCriteriumType/OPEN_DATA"/>
       <genEnumLiterals ecoreEnumLiteral="prmeta.ecore#//EvaluationCriteriumType/OTHER"/>
@@ -26,12 +27,12 @@
     <genClasses ecoreClass="prmeta.ecore#//PRPackage">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRPackage/ePackage"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute prmeta.ecore#//PRPackage/evaluationCriterium"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRPackage/prClass"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRPackage/prClassifier"/>
     </genClasses>
-    <genClasses ecoreClass="prmeta.ecore#//PRClass">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRClass/eClass"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute prmeta.ecore#//PRClass/evaluationLevel"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRClass/prFeature"/>
+    <genClasses ecoreClass="prmeta.ecore#//PRClassifier">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRClassifier/eClassifier"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute prmeta.ecore#//PRClassifier/evaluationLevel"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRClassifier/prFeature"/>
     </genClasses>
     <genClasses ecoreClass="prmeta.ecore#//PRFeature">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRFeature/feature"/>

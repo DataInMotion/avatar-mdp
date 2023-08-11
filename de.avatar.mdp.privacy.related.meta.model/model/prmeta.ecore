@@ -16,11 +16,11 @@
   <eClassifiers xsi:type="ecore:EClass" name="PRPackage">
     <eStructuralFeatures xsi:type="ecore:EReference" name="ePackage" eType="ecore:EClass ../../org.eclipse.emf.ecore/model/Ecore.ecore#//EPackage"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="evaluationCriterium" eType="#//EvaluationCriteriumType"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="prClass" upperBound="-1"
-        eType="#//PRClass" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="prClassifier" upperBound="-1"
+        eType="#//PRClassifier" containment="true"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="PRClass">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="eClass" eType="ecore:EClass ../../org.eclipse.emf.ecore/model/Ecore.ecore#//EClass"/>
+  <eClassifiers xsi:type="ecore:EClass" name="PRClassifier">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="eClassifier" eType="ecore:EClass ../../org.eclipse.emf.ecore/model/Ecore.ecore#//EClassifier"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="evaluationLevel" eType="#//EvaluationLevelType"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="prFeature" upperBound="-1"
         eType="#//PRFeature" containment="true"/>
@@ -30,9 +30,10 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="evaluationLevel" eType="#//EvaluationLevelType"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EEnum" name="EvaluationCriteriumType">
-    <eLiterals name="GDPR"/>
-    <eLiterals name="OPEN_DATA" value="1"/>
-    <eLiterals name="OTHER" value="2"/>
+    <eLiterals name="NONE"/>
+    <eLiterals name="GDPR" value="1"/>
+    <eLiterals name="OPEN_DATA" value="2"/>
+    <eLiterals name="OTHER" value="3"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EEnum" name="EvaluationLevelType">
     <eLiterals name="NONE"/>

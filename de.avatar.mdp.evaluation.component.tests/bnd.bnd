@@ -7,10 +7,14 @@ Test-Cases: ${classes;HIERARCHY_INDIRECTLY_ANNOTATED;org.junit.platform.commons.
 # sets the usually required buildpath using the bnd library, you can extend it with the normal -buildpath to your liking
 -buildpath: \
 	org.osgi.framework;version=latest,\
-	org.osgi.test.junit5.cm,\
 	de.avatar.mdp.apis,\
 	de.avatar.mdp.evaluation.model;version=latest,\
-	org.gecko.emf.osgi.example.model.basic
+	de.avatar.mdp.privacy.related.meta.model;version=latest,\
+	org.gecko.emf.osgi.example.model.basic,\
+	org.gecko.emf.repository.api,\
+	org.gecko.mongo.osgi.component,\
+	org.osgi.test.junit5.cm
+	
 	
 Private-Package: de.avatar.mdp.evaluation.component.tests
 
