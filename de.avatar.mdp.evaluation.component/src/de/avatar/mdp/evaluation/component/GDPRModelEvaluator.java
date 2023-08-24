@@ -22,9 +22,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -109,7 +111,7 @@ public class GDPRModelEvaluator implements ModelEvaluator {
 		});
 		return summary;		
 	}
-
+	
 	private List<EvaluatedTerm> prepareEvaluatedTerms(EPackage ePackage) {
 		List<EvaluatedTerm> evaluatedTerms = new LinkedList<>();
 		ePackage.getEClassifiers().forEach(classifier -> {
@@ -122,7 +124,10 @@ public class GDPRModelEvaluator implements ModelEvaluator {
 						docs.add(featureDoc);	
 					}
 					EvaluatedTerm term = MDPEvaluationFactory.eINSTANCE.createEvaluatedTerm();
-					term.setEvaluatedFeature(EcoreUtil.copy(feature));
+					URI uri = EcoreUtil.getURI(feature);
+					InternalEObject internalEObj = (InternalEObject) feature;
+					internalEObj.eSetProxyURI(uri);
+					term.setEvaluatedFeature(feature);
 					term.setFeatureClassifierName(eClass.getName());
 					docs.forEach(doc -> {
 						Evaluation evaluation = MDPEvaluationFactory.eINSTANCE.createEvaluation();

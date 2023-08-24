@@ -14,11 +14,15 @@
 package de.avatar.mdp.evaluation.component.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EPackage;
-import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.gecko.emf.osgi.example.model.basic.BasicPackage;
 import org.gecko.emf.repository.EMFRepository;
@@ -42,7 +46,6 @@ import de.avatar.mdp.prmeta.EvaluationCriteriumType;
 import de.avatar.mdp.prmeta.EvaluationLevelType;
 import de.avatar.mdp.prmeta.PRClassifier;
 import de.avatar.mdp.prmeta.PRFeature;
-import de.avatar.mdp.prmeta.PRMetaFactory;
 import de.avatar.mdp.prmeta.PRModel;
 import de.avatar.mdp.prmeta.PRPackage;
 
@@ -87,7 +90,7 @@ public class PRMetaModelServiceTest {
 		assertThat(metaModelService).isNotNull();
 	}
 	
-//	@Test
+	@Test
 	@WithFactoryConfiguration(
 			factoryPid = "EMFMongoRepositoryConfigurator",
 			location = "?",
@@ -103,6 +106,7 @@ public class PRMetaModelServiceTest {
 			,@InjectService(timeout=5000l) ServiceAware<PRMetaModelService> metaModelAware,
 			@InjectService ServiceAware<BasicPackage> packAware
 			) throws IOException {
+	
 		
 		assertThat(repoAware).isNotNull();
 		EMFRepository repo = repoAware.getService();
@@ -116,28 +120,7 @@ public class PRMetaModelServiceTest {
 		BasicPackage model = packAware.getService();
 		assertThat(model).isNotNull();
 		
-		assertThat(model.eResource()).isNotNull();
-		repo.getResourceSet().createResource(model.eResource().getURI()).getContents().add(model);
-		Resource res = repo.getResourceSet().getResource(model.eResource().getURI(), true);
-		EPackage modelCopy = EcoreUtil.copy(model);
-		res.getContents().add(modelCopy);
-		assertThat(modelCopy.eResource().getResourceSet()).isNotNull();
-		
-		PRModel prModel = PRMetaFactory.eINSTANCE.createPRModel();
-		prModel.setPackageURI(modelCopy.getNsURI());
-		PRPackage prPackage = PRMetaFactory.eINSTANCE.createPRPackage();
-		prPackage.setEPackage(modelCopy);
-		prPackage.setEvaluationCriterium(EvaluationCriteriumType.GDPR);
-//		PRClass prClass = PRMetaFactory.eINSTANCE.createPRClass();
-//		prClass.setEClass(model.getAddress());
-//		prClass.setEvaluationLevel(EvaluationLevelType.WARNING);
-//		PRFeature prFeature = PRMetaFactory.eINSTANCE.createPRFeature();
-//		prFeature.setFeature(model.getAddress_City());
-//		prFeature.setEvaluationLevel(EvaluationLevelType.WARNING);
-//		prClass.getPrFeature().add(prFeature);
-//		prPackage.getPrClass().add(prClass);
-		prModel.getPrPackage().add(prPackage);
-		
+		PRModel prModel = metaModelService.createPRModel(createTestEvaluationSummary(), model);		
 		metaModelService.savePRModel(prModel);
 	}
 	
@@ -170,12 +153,70 @@ public class PRMetaModelServiceTest {
 		BasicPackage model = packAware.getService();
 		assertThat(model).isNotNull();
 		
+		PRModel prModel = metaModelService.createPRModel(createTestEvaluationSummary(), model);
+		assertThat(prModel).isNotNull();
+		assertThat(prModel.getPackageURI()).isEqualTo(model.getNsURI());
+		assertThat(prModel.getPrPackage()).hasSize(2); //by default also the one with EvaluationCriteriumType.NONE is added
+		
+		PRPackage prPackage1 = null, prPackage2 = null;
+		for(PRPackage prPackage : prModel.getPrPackage()) {
+			if(prPackage.getEvaluationCriterium().equals(EvaluationCriteriumType.NONE)) {
+				prPackage1 = prPackage;
+			}
+			else if(prPackage.getEvaluationCriterium().equals(EvaluationCriteriumType.GDPR)) {
+				prPackage2 = prPackage;
+			}
+		}
+		assertThat(prPackage1).isNotNull();
+		assertThat(prPackage2).isNotNull();
+		assertThat(prPackage2.getPrClassifier()).hasSize(2);
+		assertTrue(prPackage2.getEPackage().eIsProxy());
+		EPackage ePackage = (EPackage) EcoreUtil.resolve(prPackage2.getEPackage(), prModel);
+		assertThat(ePackage.getNsURI()).isEqualTo(model.getNsURI());
+		
+		PRClassifier prc1 = null, prc2 = null;
+		for(PRClassifier prc : prPackage2.getPrClassifier()) {
+			assertTrue(prc.getEClassifier().eIsProxy());
+			EClassifier ec = (EClassifier) EcoreUtil.resolve(prc.getEClassifier(), prModel);
+			if(ec.getName().equals(model.getAddress().getName())) {
+				prc1 = prc;
+			} else if(ec.getName().equals(model.getContact().getName())) {
+				prc2 = prc;
+			}
+		}
+		assertThat(prc1).isNotNull();
+		assertThat(prc2).isNotNull();
+		
+		assertThat(prc1.getEvaluationLevel()).isEqualTo(EvaluationLevelType.WARNING);
+		assertThat(prc2.getEvaluationLevel()).isEqualTo(EvaluationLevelType.NONE);
+				
+		assertThat(prc1.getPrFeature()).hasSize(1);
+		assertThat(prc2.getPrFeature()).hasSize(1);
+
+		PRFeature prf1 = prc1.getPrFeature().get(0);
+		assertThat(prf1.getEvaluationLevel()).isEqualTo(EvaluationLevelType.WARNING);
+		assertTrue(prf1.getFeature().eIsProxy());
+		EStructuralFeature sf1 = (EStructuralFeature) EcoreUtil.resolve(prf1.getFeature(), prModel);
+		assertThat(sf1.getName()).isEqualTo(BasicPackage.eINSTANCE.getAddress_City().getName());
+		
+		PRFeature prf2 = prc2.getPrFeature().get(0);
+		assertThat(prf2.getEvaluationLevel()).isEqualTo(EvaluationLevelType.NONE);
+		assertTrue(prf2.getFeature().eIsProxy());
+		EStructuralFeature sf2 = (EStructuralFeature) EcoreUtil.resolve(prf2.getFeature(), prModel);
+		assertThat(sf2.getName()).isEqualTo(model.getContact_Context().getName());		
+	}
+
+	private EvaluationSummary createTestEvaluationSummary() {
 		EvaluationSummary summary = MDPEvaluationFactory.eINSTANCE.createEvaluationSummary();
 		summary.setEvaluationCriterium(de.avatar.mdp.evaluation.EvaluationCriteriumType.GDPR);
 		
 		EvaluatedTerm term1 = MDPEvaluationFactory.eINSTANCE.createEvaluatedTerm();
-		term1.setEvaluatedFeature(EcoreUtil.copy(model.getAddress_City()));
-		term1.setFeatureClassifierName(model.getAddress().getName());
+		EStructuralFeature f1 = BasicPackage.eINSTANCE.getAddress_City();
+		URI uri1 = EcoreUtil.getURI(f1);
+		InternalEObject ieo1 = (InternalEObject) f1;
+		ieo1.eSetProxyURI(uri1);
+		term1.setEvaluatedFeature(f1);
+		term1.setFeatureClassifierName(BasicPackage.eINSTANCE.getAddress().getName());
 		Evaluation e11 = MDPEvaluationFactory.eINSTANCE.createEvaluation();
 		e11.setInput("city");
 		e11.setRelevant(true);
@@ -186,8 +227,12 @@ public class PRMetaModelServiceTest {
 		term1.getEvaluations().add(e12);
 		
 		EvaluatedTerm term2 = MDPEvaluationFactory.eINSTANCE.createEvaluatedTerm();
-		term2.setEvaluatedFeature(EcoreUtil.copy(model.getContact_Context()));
-		term2.setFeatureClassifierName(model.getContact().getName());
+		EStructuralFeature f2 = BasicPackage.eINSTANCE.getContact_Context();
+		URI uri2 = EcoreUtil.getURI(f2);
+		InternalEObject ieo2 = (InternalEObject) f2;
+		ieo2.eSetProxyURI(uri2);
+		term2.setEvaluatedFeature(f2);
+		term2.setFeatureClassifierName(BasicPackage.eINSTANCE.getContact().getName());
 		Evaluation e21 = MDPEvaluationFactory.eINSTANCE.createEvaluation();
 		e21.setInput("context");
 		e21.setRelevant(false);
@@ -195,44 +240,7 @@ public class PRMetaModelServiceTest {
 
 		summary.getEvaluatedTerms().add(term1);
 		summary.getEvaluatedTerms().add(term2);
-		
-		PRModel prModel = metaModelService.createPRModel(summary, model);
-		assertThat(prModel).isNotNull();
-		assertThat(prModel.getPackageURI()).isEqualTo(model.getNsURI());
-		assertThat(prModel.getPrPackage()).hasSize(1);
-		
-		PRPackage prPackage = prModel.getPrPackage().get(0);
-		assertThat(prPackage.getEvaluationCriterium()).isEqualTo(EvaluationCriteriumType.GDPR);
-		assertThat(prPackage.getPrClassifier()).hasSize(2);
-		assertThat(prPackage.getEPackage()).isEqualTo(model);
-		
-		PRClassifier prc1 = null, prc2 = null;
-		for(PRClassifier prc : prPackage.getPrClassifier()) {
-			if(prc.getEClassifier().equals(model.getAddress())) {
-				prc1 = prc;
-			} else if(prc.getEClassifier().equals(model.getContact())) {
-				prc2 = prc;
-			}
-		}
-		assertThat(prc1).isNotNull();
-		assertThat(prc2).isNotNull();
-		
-		assertThat(prc1.getEvaluationLevel()).isEqualTo(EvaluationLevelType.WARNING);
-		assertThat(prc2.getEvaluationLevel()).isEqualTo(EvaluationLevelType.NONE);
-		
-		assertThat(prc1.getEClassifier()).isEqualTo(model.getAddress());
-		assertThat(prc2.getEClassifier()).isEqualTo(model.getContact());
-		
-		assertThat(prc1.getPrFeature()).hasSize(1);
-		assertThat(prc2.getPrFeature()).hasSize(1);
-
-		PRFeature prf1 = prc1.getPrFeature().get(0);
-		assertThat(prf1.getEvaluationLevel()).isEqualTo(EvaluationLevelType.WARNING);
-		assertThat(prf1.getFeature().getName()).isEqualTo(model.getAddress_City().getName());
-		
-		PRFeature prf2 = prc2.getPrFeature().get(0);
-		assertThat(prf2.getEvaluationLevel()).isEqualTo(EvaluationLevelType.NONE);
-		assertThat(prf2.getFeature().getName()).isEqualTo(model.getContact_Context().getName());		
+		return summary;
 	}
-
+	
 }

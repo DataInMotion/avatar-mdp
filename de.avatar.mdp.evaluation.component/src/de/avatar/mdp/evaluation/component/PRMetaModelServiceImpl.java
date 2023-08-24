@@ -15,10 +15,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
 
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.InternalEObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.gecko.emf.repository.query.IQuery;
 import org.gecko.emf.repository.query.IQueryBuilder;
 import org.gecko.emf.repository.query.QueryRepository;
@@ -117,24 +121,26 @@ public class PRMetaModelServiceImpl implements PRMetaModelService {
 		if(existingPRPackage == null) prPackage = PRMetaFactory.eINSTANCE.createPRPackage();
 		else prPackage = existingPRPackage;
 		prPackage.setEvaluationCriterium(EvaluationCriteriumType.getByName(evaluationSummary.getEvaluationCriterium().getName()));
-		prPackage.setEPackage(ePackage);
+		prPackage.setEPackage((EPackage) proxifyEObject(ePackage, ePackage.getNsURI()));
 		
 //		Loop over the EvaluationSummary features and add the corresponding PRFeature to the PRModel
 		evaluationSummary.getEvaluatedTerms().forEach(et -> {
-			EStructuralFeature feature = et.getEvaluatedFeature();
-			
+			EStructuralFeature feature = et.getEvaluatedFeature();		
+			if(feature.eIsProxy()) {
+				feature = (EStructuralFeature) EcoreUtil.resolve(feature, prPackage);
+			}
 			PRFeature prFeature = PRMetaFactory.eINSTANCE.createPRFeature();
-			prFeature.setFeature(feature);
+			prFeature.setFeature((EStructuralFeature) proxifyEObject(feature, ePackage.getNsURI()));
 			boolean isFeatureRelevant = et.getEvaluations().stream().filter(e -> e.isRelevant()).findAny().orElse(null) != null;
 			prFeature.setEvaluationLevel(isFeatureRelevant ? EvaluationLevelType.WARNING : EvaluationLevelType.NONE);
-			
 			EClassifier eClassifier = ePackage.getEClassifier(et.getFeatureClassifierName());
+			
 			PRClassifier prClassifier = prPackage.getPrClassifier().stream().filter(c -> c.getEClassifier().equals(eClassifier)).findFirst().orElse(null);
 			if(prClassifier == null) {
 				prClassifier = PRMetaFactory.eINSTANCE.createPRClassifier();
 				prPackage.getPrClassifier().add(prClassifier);
 			}
-			prClassifier.setEClassifier(eClassifier);
+			prClassifier.setEClassifier((EClassifier) proxifyEObject(eClassifier, ePackage.getNsURI()));
 			prClassifier.getPrFeature().add(prFeature);
 			boolean isClassifierRelevant = prClassifier.getPrFeature().stream().filter(prf -> prf.getEvaluationLevel().equals(EvaluationLevelType.WARNING)).findAny().orElse(null) != null;
 			prClassifier.setEvaluationLevel(isClassifierRelevant ? EvaluationLevelType.WARNING : EvaluationLevelType.NONE);
@@ -147,16 +153,19 @@ public class PRMetaModelServiceImpl implements PRMetaModelService {
 	
 	private PRPackage createPRPackageWOCriterium(EPackage ePackage) {
 		PRPackage prPackage = PRMetaFactory.eINSTANCE.createPRPackage();
-		prPackage.setEPackage(ePackage);
+		prPackage.setEPackage((EPackage) proxifyEObject(ePackage, ePackage.getNsURI()));
 		prPackage.setEvaluationCriterium(EvaluationCriteriumType.NONE);
 		ePackage.getEClassifiers().forEach(ec -> {
 			PRClassifier prClassifier = PRMetaFactory.eINSTANCE.createPRClassifier();
-			prClassifier.setEClassifier(ec);
+			prClassifier.setEClassifier((EClassifier)proxifyEObject(ec, ePackage.getNsURI()));
 			prClassifier.setEvaluationLevel(EvaluationLevelType.NONE);
 			if(ec instanceof EClass eclass) {
 				eclass.getEAllStructuralFeatures().forEach(sf -> {
+					if(sf.eIsProxy()) {
+						sf = (EStructuralFeature) EcoreUtil.resolve(sf, prPackage);
+					}
 					PRFeature prFeature = PRMetaFactory.eINSTANCE.createPRFeature();
-					prFeature.setFeature(sf);
+					prFeature.setFeature((EStructuralFeature)proxifyEObject(sf, ePackage.getNsURI()));
 					prFeature.setEvaluationLevel(EvaluationLevelType.NONE);
 					prClassifier.getPrFeature().add(prFeature);
 				});
@@ -164,5 +173,19 @@ public class PRMetaModelServiceImpl implements PRMetaModelService {
 			prPackage.getPrClassifier().add(prClassifier);
 		});
 		return prPackage;
+	}
+	
+	private EObject proxifyEObject(EObject eObj, String uriString) {
+		
+		if(eObj instanceof InternalEObject) {
+			InternalEObject ieo = (InternalEObject) eObj;
+			if(!(eObj instanceof EPackage)) {
+				ieo.eSetProxyURI(EcoreUtil.getURI(eObj));
+			} else {
+				ieo.eSetProxyURI(URI.createURI(uriString));
+			}
+			return ieo;
+		}
+		throw new IllegalStateException(String.format("EObject %s is not an instance of InternalEObject!", eObj.toString()));
 	}
 }
