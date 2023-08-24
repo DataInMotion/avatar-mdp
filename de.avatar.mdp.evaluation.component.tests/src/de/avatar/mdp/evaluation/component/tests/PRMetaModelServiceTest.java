@@ -42,6 +42,7 @@ import de.avatar.mdp.evaluation.EvaluatedTerm;
 import de.avatar.mdp.evaluation.Evaluation;
 import de.avatar.mdp.evaluation.EvaluationSummary;
 import de.avatar.mdp.evaluation.MDPEvaluationFactory;
+import de.avatar.mdp.evaluation.RelevanceLevelType;
 import de.avatar.mdp.prmeta.EvaluationCriteriumType;
 import de.avatar.mdp.prmeta.EvaluationLevelType;
 import de.avatar.mdp.prmeta.PRClassifier;
@@ -187,20 +188,20 @@ public class PRMetaModelServiceTest {
 		assertThat(prc1).isNotNull();
 		assertThat(prc2).isNotNull();
 		
-		assertThat(prc1.getEvaluationLevel()).isEqualTo(EvaluationLevelType.WARNING);
-		assertThat(prc2.getEvaluationLevel()).isEqualTo(EvaluationLevelType.NONE);
+		assertThat(prc1.getEvaluationLevel()).isEqualTo(EvaluationLevelType.RELEVANT);
+		assertThat(prc2.getEvaluationLevel()).isEqualTo(EvaluationLevelType.NOT_RELEVANT);
 				
 		assertThat(prc1.getPrFeature()).hasSize(1);
 		assertThat(prc2.getPrFeature()).hasSize(1);
 
 		PRFeature prf1 = prc1.getPrFeature().get(0);
-		assertThat(prf1.getEvaluationLevel()).isEqualTo(EvaluationLevelType.WARNING);
+		assertThat(prf1.getEvaluationLevel()).isEqualTo(EvaluationLevelType.RELEVANT);
 		assertTrue(prf1.getFeature().eIsProxy());
 		EStructuralFeature sf1 = (EStructuralFeature) EcoreUtil.resolve(prf1.getFeature(), prModel);
 		assertThat(sf1.getName()).isEqualTo(BasicPackage.eINSTANCE.getAddress_City().getName());
 		
 		PRFeature prf2 = prc2.getPrFeature().get(0);
-		assertThat(prf2.getEvaluationLevel()).isEqualTo(EvaluationLevelType.NONE);
+		assertThat(prf2.getEvaluationLevel()).isEqualTo(EvaluationLevelType.NOT_RELEVANT);
 		assertTrue(prf2.getFeature().eIsProxy());
 		EStructuralFeature sf2 = (EStructuralFeature) EcoreUtil.resolve(prf2.getFeature(), prModel);
 		assertThat(sf2.getName()).isEqualTo(model.getContact_Context().getName());		
@@ -219,10 +220,10 @@ public class PRMetaModelServiceTest {
 		term1.setFeatureClassifierName(BasicPackage.eINSTANCE.getAddress().getName());
 		Evaluation e11 = MDPEvaluationFactory.eINSTANCE.createEvaluation();
 		e11.setInput("city");
-		e11.setRelevant(true);
+		e11.setRelevanceLevel(RelevanceLevelType.RELEVANT);
 		Evaluation e12 = MDPEvaluationFactory.eINSTANCE.createEvaluation();
 		e12.setInput("The city of the customer");
-		e12.setRelevant(false);
+		e12.setRelevanceLevel(RelevanceLevelType.POTENTIALLY_RELEVANT);
 		term1.getEvaluations().add(e11);
 		term1.getEvaluations().add(e12);
 		
@@ -235,7 +236,7 @@ public class PRMetaModelServiceTest {
 		term2.setFeatureClassifierName(BasicPackage.eINSTANCE.getContact().getName());
 		Evaluation e21 = MDPEvaluationFactory.eINSTANCE.createEvaluation();
 		e21.setInput("context");
-		e21.setRelevant(false);
+		e21.setRelevanceLevel(RelevanceLevelType.NOT_RELEVANT);
 		term2.getEvaluations().add(e21);
 
 		summary.getEvaluatedTerms().add(term1);

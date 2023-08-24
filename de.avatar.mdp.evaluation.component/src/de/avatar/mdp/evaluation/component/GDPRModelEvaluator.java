@@ -40,6 +40,7 @@ import de.avatar.mdp.evaluation.Evaluation;
 import de.avatar.mdp.evaluation.EvaluationCriteriumType;
 import de.avatar.mdp.evaluation.EvaluationSummary;
 import de.avatar.mdp.evaluation.MDPEvaluationFactory;
+import de.avatar.mdp.evaluation.RelevanceLevelType;
 import de.avatar.mdp.evaluation.component.helper.EvaluationHelper;
 
 @Component(name="GDPRModelEvaluator", service = ModelEvaluator.class, configurationPid = "GDPRModelEvaluator", configurationPolicy = ConfigurationPolicy.REQUIRE)
@@ -98,14 +99,14 @@ public class GDPRModelEvaluator implements ModelEvaluator {
 				LOGGER.severe(String.format("No matching term found for evaluated %s", k));
 				throw new IllegalStateException(String.format("No matching term found for evaluated %s", k));
 			}
-			Map<String, Boolean> predictions = (Map<String, Boolean>) v;
+			Map<String, String> predictions = (Map<String, String>) v;
 			predictions.forEach((doc, pred) -> {
 				Evaluation evaluation = evaluatedTerm.getEvaluations().stream().filter(e -> e.getInput().equals(doc)).findFirst().orElse(null);
 				if(evaluation == null) {
 					LOGGER.severe(String.format("No matching evaluation doc found for evaluated %s", doc));
 					throw new IllegalStateException(String.format("No matching evaluation doc found for evaluated %s", doc));
 				}
-				evaluation.setRelevant(pred);
+				evaluation.setRelevanceLevel(RelevanceLevelType.valueOf(pred));
 			});
 			summary.getEvaluatedTerms().add(evaluatedTerm);
 		});

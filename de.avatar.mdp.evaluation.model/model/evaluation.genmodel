@@ -13,6 +13,11 @@
       <genEnumLiterals ecoreEnumLiteral="evaluation.ecore#//EvaluationCriteriumType/OPEN_DATA"/>
       <genEnumLiterals ecoreEnumLiteral="evaluation.ecore#//EvaluationCriteriumType/OTHER"/>
     </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="evaluation.ecore#//RelevanceLevelType">
+      <genEnumLiterals ecoreEnumLiteral="evaluation.ecore#//RelevanceLevelType/NOT_RELEVANT"/>
+      <genEnumLiterals ecoreEnumLiteral="evaluation.ecore#//RelevanceLevelType/POTENTIALLY_RELEVANT"/>
+      <genEnumLiterals ecoreEnumLiteral="evaluation.ecore#//RelevanceLevelType/RELEVANT"/>
+    </genEnums>
     <genClasses ecoreClass="evaluation.ecore#//EvaluationSummary">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute evaluation.ecore#//EvaluationSummary/evaluationCriterium"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference evaluation.ecore#//EvaluationSummary/evaluatedTerms"/>
@@ -24,7 +29,7 @@
     </genClasses>
     <genClasses ecoreClass="evaluation.ecore#//Evaluation">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute evaluation.ecore#//Evaluation/input"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute evaluation.ecore#//Evaluation/relevant"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute evaluation.ecore#//Evaluation/relevanceLevel"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

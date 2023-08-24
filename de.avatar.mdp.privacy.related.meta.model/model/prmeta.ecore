@@ -36,8 +36,8 @@
     <eLiterals name="OTHER" value="3"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EEnum" name="EvaluationLevelType">
-    <eLiterals name="NONE"/>
-    <eLiterals name="WARNING" value="1"/>
-    <eLiterals name="SEVERE" value="2"/>
+    <eLiterals name="NOT_RELEVANT"/>
+    <eLiterals name="POTENTIALLY_RELEVANT" value="1"/>
+    <eLiterals name="RELEVANT" value="2"/>
   </eClassifiers>
 </ecore:EPackage>

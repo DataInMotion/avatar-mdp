@@ -32,6 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 
 import de.avatar.mdp.apis.api.PRMetaModelService;
 import de.avatar.mdp.evaluation.EvaluationSummary;
+import de.avatar.mdp.evaluation.RelevanceLevelType;
 import de.avatar.mdp.prmeta.EvaluationCriteriumType;
 import de.avatar.mdp.prmeta.EvaluationLevelType;
 import de.avatar.mdp.prmeta.PRClassifier;
@@ -131,8 +132,18 @@ public class PRMetaModelServiceImpl implements PRMetaModelService {
 			}
 			PRFeature prFeature = PRMetaFactory.eINSTANCE.createPRFeature();
 			prFeature.setFeature((EStructuralFeature) proxifyEObject(feature, ePackage.getNsURI()));
-			boolean isFeatureRelevant = et.getEvaluations().stream().filter(e -> e.isRelevant()).findAny().orElse(null) != null;
-			prFeature.setEvaluationLevel(isFeatureRelevant ? EvaluationLevelType.WARNING : EvaluationLevelType.NONE);
+			RelevanceLevelType featureRelevance = et.getEvaluations().stream()
+					.map(e -> e.getRelevanceLevel())
+					.filter(rl -> rl.equals(RelevanceLevelType.RELEVANT))
+					.findAny().orElse(RelevanceLevelType.NOT_RELEVANT);
+			if(featureRelevance == RelevanceLevelType.NOT_RELEVANT) {
+				featureRelevance = et.getEvaluations().stream()
+						.map(e -> e.getRelevanceLevel())
+						.filter(rl -> rl.equals(RelevanceLevelType.POTENTIALLY_RELEVANT))
+						.findAny().orElse(RelevanceLevelType.NOT_RELEVANT);
+			}
+					
+			prFeature.setEvaluationLevel(EvaluationLevelType.get(featureRelevance.getLiteral()));
 			EClassifier eClassifier = ePackage.getEClassifier(et.getFeatureClassifierName());
 			
 			PRClassifier prClassifier = prPackage.getPrClassifier().stream().filter(c -> c.getEClassifier().equals(eClassifier)).findFirst().orElse(null);
@@ -142,11 +153,24 @@ public class PRMetaModelServiceImpl implements PRMetaModelService {
 			}
 			prClassifier.setEClassifier((EClassifier) proxifyEObject(eClassifier, ePackage.getNsURI()));
 			prClassifier.getPrFeature().add(prFeature);
-			boolean isClassifierRelevant = prClassifier.getPrFeature().stream().filter(prf -> prf.getEvaluationLevel().equals(EvaluationLevelType.WARNING)).findAny().orElse(null) != null;
-			prClassifier.setEvaluationLevel(isClassifierRelevant ? EvaluationLevelType.WARNING : EvaluationLevelType.NONE);
+			
+			EvaluationLevelType classifierRelevance = 
+					prClassifier.getPrFeature().stream()
+						.map(prf -> prf.getEvaluationLevel())
+						.filter(el -> el.equals(EvaluationLevelType.RELEVANT))
+						.findAny().orElse(EvaluationLevelType.NOT_RELEVANT);
+			if(classifierRelevance == EvaluationLevelType.NOT_RELEVANT) {
+				classifierRelevance = 
+						prClassifier.getPrFeature().stream()
+							.map(prf -> prf.getEvaluationLevel())
+							.filter(el -> el.equals(EvaluationLevelType.POTENTIALLY_RELEVANT))
+							.findAny().orElse(EvaluationLevelType.NOT_RELEVANT);
+			}
+			prClassifier.setEvaluationLevel(classifierRelevance);
 		});
 		
 		prModel.getPrPackage().add(prPackage);
+		savePRModel(prModel);
 		return prModel;
 	}
 
@@ -158,7 +182,7 @@ public class PRMetaModelServiceImpl implements PRMetaModelService {
 		ePackage.getEClassifiers().forEach(ec -> {
 			PRClassifier prClassifier = PRMetaFactory.eINSTANCE.createPRClassifier();
 			prClassifier.setEClassifier((EClassifier)proxifyEObject(ec, ePackage.getNsURI()));
-			prClassifier.setEvaluationLevel(EvaluationLevelType.NONE);
+			prClassifier.setEvaluationLevel(EvaluationLevelType.NOT_RELEVANT);
 			if(ec instanceof EClass eclass) {
 				eclass.getEAllStructuralFeatures().forEach(sf -> {
 					if(sf.eIsProxy()) {
@@ -166,7 +190,7 @@ public class PRMetaModelServiceImpl implements PRMetaModelService {
 					}
 					PRFeature prFeature = PRMetaFactory.eINSTANCE.createPRFeature();
 					prFeature.setFeature((EStructuralFeature)proxifyEObject(sf, ePackage.getNsURI()));
-					prFeature.setEvaluationLevel(EvaluationLevelType.NONE);
+					prFeature.setEvaluationLevel(EvaluationLevelType.NOT_RELEVANT);
 					prClassifier.getPrFeature().add(prFeature);
 				});
 			}

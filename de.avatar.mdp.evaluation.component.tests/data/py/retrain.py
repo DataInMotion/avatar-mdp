@@ -37,9 +37,12 @@ glove_vectorizer = W2vVectorizer(glove_dict)
 vectorized_train = glove_vectorizer.transform(TextTokenizer().transform(CleanTextTransformer().transform(train_text)))
 vectorized_test = glove_vectorizer.transform(TextTokenizer().transform(CleanTextTransformer().transform(test_text)))
 
-# Compute cosine distances and determine new best threshold
+# Compute cosine distances and determine new best threshold and new upper bound
 distances = computeDistances(vectorized_test, test_label, vectorized_train)
 threshold = findOptimalThreshold(distances[0], distances[1])
+threshold_upper_bound = findDistanceUpperBound(distances[0], 0.8) 
+threshold_params = {"threshold": threshold, "upper_bound": threshold_upper_bound}
+
 
 # Save new model and parameters
 timestamp = datetime.now().isoformat()
@@ -60,7 +63,7 @@ vectorized_train_storing = [fromVectorToList(vector) for vector in vectorized_tr
 saveAsJson(train_vector_out_ts, vectorized_train_storing)
 saveAsJson(train_vector_out, vectorized_train_storing)
 
-threshold_out_ts = base_path + "cos_dist_threshold_"+timestamp+".json"
-threshold_out = base_path + "cos_dist_threshold.json"
-saveAsJson(threshold_out_ts, threshold)
-saveAsJson(threshold_out, threshold)
+threshold_out_ts = base_path + "cos_dist_threshold_params_"+timestamp+".json"
+threshold_out = base_path + "cos_dist_threshold_params.json"
+saveAsJson(threshold_out_ts, threshold_params)
+saveAsJson(threshold_out, threshold_params)

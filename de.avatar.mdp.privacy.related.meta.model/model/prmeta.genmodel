@@ -15,9 +15,9 @@
       <genEnumLiterals ecoreEnumLiteral="prmeta.ecore#//EvaluationCriteriumType/OTHER"/>
     </genEnums>
     <genEnums typeSafeEnumCompatible="false" ecoreEnum="prmeta.ecore#//EvaluationLevelType">
-      <genEnumLiterals ecoreEnumLiteral="prmeta.ecore#//EvaluationLevelType/NONE"/>
-      <genEnumLiterals ecoreEnumLiteral="prmeta.ecore#//EvaluationLevelType/WARNING"/>
-      <genEnumLiterals ecoreEnumLiteral="prmeta.ecore#//EvaluationLevelType/SEVERE"/>
+      <genEnumLiterals ecoreEnumLiteral="prmeta.ecore#//EvaluationLevelType/NOT_RELEVANT"/>
+      <genEnumLiterals ecoreEnumLiteral="prmeta.ecore#//EvaluationLevelType/POTENTIALLY_RELEVANT"/>
+      <genEnumLiterals ecoreEnumLiteral="prmeta.ecore#//EvaluationLevelType/RELEVANT"/>
     </genEnums>
     <genClasses ecoreClass="prmeta.ecore#//PRModel">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute prmeta.ecore#//PRModel/id"/>

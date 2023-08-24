@@ -18,11 +18,16 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Evaluation">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="input" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="relevant" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="relevanceLevel" eType="#//RelevanceLevelType"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EEnum" name="EvaluationCriteriumType">
     <eLiterals name="GDPR"/>
     <eLiterals name="OPEN_DATA" value="1"/>
     <eLiterals name="OTHER" value="2"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="RelevanceLevelType">
+    <eLiterals name="NOT_RELEVANT"/>
+    <eLiterals name="POTENTIALLY_RELEVANT" value="1"/>
+    <eLiterals name="RELEVANT" value="2"/>
   </eClassifiers>
 </ecore:EPackage>

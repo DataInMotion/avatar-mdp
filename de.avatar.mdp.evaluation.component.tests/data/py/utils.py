@@ -230,13 +230,19 @@ def adjustDictForStoring(dict):
         dict_storing[word.decode("utf-8")] = fromVectorToList(vector)
     return dict_storing
 
-def computePredictions(test_set, vectorized_test, vectorized_train, loaded_threshold):
+def computePredictions(test_set, vectorized_test, vectorized_train, loaded_threshold, loaded_threshold_upper_bound):
     predictions = {}
     i = 0
     for doc in vectorized_test:
         minDist = computeMinDist(doc, vectorized_train)
         original_doc = test_set[i]
-        predictions[original_doc] = isDistBelowThreshold(minDist, loaded_threshold)
+        print(minDist)
+        if isDistBelowThreshold(minDist, loaded_threshold):
+            predictions[original_doc] = "RELEVANT"
+        elif isDistBelowThreshold(minDist, loaded_threshold_upper_bound):
+            predictions[original_doc] = "POTENTIALLY_RELEVANT"
+        else:
+            predictions[original_doc] = "NOT_RELEVANT"
         i = i+1
     return predictions
     
@@ -254,3 +260,18 @@ def concatDataFrames(df1, df2):
     
 def saveDataFrame(fileName, df):
     df.to_excel(fileName, engine="odf", index=False)
+    
+#Filter for findDistanceUpperBound
+def count(threshold, distance):
+    if distance < threshold:
+        return True
+    return False
+
+#Find the value of cosine dist threshold which would select a portion (sensitivity) of all the related documents 
+def findDistanceUpperBound(distances, sensitivity):
+    distances.sort()
+    for t in range(0,11):
+        thresh = 0.1*t
+        num = len(list(filter(lambda x: count(thresh, x), distances)))
+        if num/len(distances) >= sensitivity:
+            return thresh
