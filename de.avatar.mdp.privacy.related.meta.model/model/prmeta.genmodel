@@ -14,10 +14,10 @@
       <genEnumLiterals ecoreEnumLiteral="prmeta.ecore#//EvaluationCriteriumType/OPEN_DATA"/>
       <genEnumLiterals ecoreEnumLiteral="prmeta.ecore#//EvaluationCriteriumType/OTHER"/>
     </genEnums>
-    <genEnums typeSafeEnumCompatible="false" ecoreEnum="prmeta.ecore#//EvaluationLevelType">
-      <genEnumLiterals ecoreEnumLiteral="prmeta.ecore#//EvaluationLevelType/NOT_RELEVANT"/>
-      <genEnumLiterals ecoreEnumLiteral="prmeta.ecore#//EvaluationLevelType/POTENTIALLY_RELEVANT"/>
-      <genEnumLiterals ecoreEnumLiteral="prmeta.ecore#//EvaluationLevelType/RELEVANT"/>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="prmeta.ecore#//RelevanceLevelType">
+      <genEnumLiterals ecoreEnumLiteral="prmeta.ecore#//RelevanceLevelType/NOT_RELEVANT"/>
+      <genEnumLiterals ecoreEnumLiteral="prmeta.ecore#//RelevanceLevelType/POTENTIALLY_RELEVANT"/>
+      <genEnumLiterals ecoreEnumLiteral="prmeta.ecore#//RelevanceLevelType/RELEVANT"/>
     </genEnums>
     <genClasses ecoreClass="prmeta.ecore#//PRModel">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute prmeta.ecore#//PRModel/id"/>
@@ -31,12 +31,16 @@
     </genClasses>
     <genClasses ecoreClass="prmeta.ecore#//PRClassifier">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRClassifier/eClassifier"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute prmeta.ecore#//PRClassifier/evaluationLevel"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRClassifier/prFeature"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRClassifier/relevance"/>
     </genClasses>
     <genClasses ecoreClass="prmeta.ecore#//PRFeature">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRFeature/feature"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute prmeta.ecore#//PRFeature/evaluationLevel"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRFeature/relevance"/>
+    </genClasses>
+    <genClasses ecoreClass="prmeta.ecore#//Relevance">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute prmeta.ecore#//Relevance/category"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute prmeta.ecore#//Relevance/level"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

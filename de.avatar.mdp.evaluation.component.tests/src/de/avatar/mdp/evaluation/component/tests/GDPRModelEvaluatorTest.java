@@ -50,6 +50,8 @@ public class GDPRModelEvaluatorTest {
 			location = "?",
 			name = "test", 
 			properties = {
+					@Property(key = "basePath", value = "./data/"),
+					@Property(key = "modelPath", value = "./data/model/"),
 					@Property(key = "pyScriptBasePath", value = "./data/py/"),
 					@Property(key = "outputBasePath", value = "./data/out/")
 

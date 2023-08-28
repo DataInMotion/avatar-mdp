@@ -40,6 +40,7 @@ import de.avatar.mdp.evaluation.Evaluation;
 import de.avatar.mdp.evaluation.EvaluationCriteriumType;
 import de.avatar.mdp.evaluation.EvaluationSummary;
 import de.avatar.mdp.evaluation.MDPEvaluationFactory;
+import de.avatar.mdp.evaluation.Relevance;
 import de.avatar.mdp.evaluation.RelevanceLevelType;
 import de.avatar.mdp.evaluation.component.helper.EvaluationHelper;
 
@@ -51,8 +52,10 @@ public class GDPRModelEvaluator implements ModelEvaluator {
 	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd_HH:mm:ss.SSS");
 	
 	public @interface GDPRModelEvaluatorConfig {
-		String pyScriptBasePath() default "";
-		String outputBasePath() default "";
+		String basePath() default "./";
+		String modelPath() default "./model/";
+		String pyScriptBasePath() default "./py/";
+		String outputBasePath() default "./out/";
 	}
 	
 	private GDPRModelEvaluatorConfig config;
@@ -77,7 +80,7 @@ public class GDPRModelEvaluator implements ModelEvaluator {
             LocalDateTime date = LocalDateTime.now();
             String dateStr = date.format(DATE_TIME_FORMATTER);
             String outFileName = config.outputBasePath() + ePackage.getName() + "_" + dateStr +".json";
-            EvaluationHelper.executeExternalCmd(LOGGER, "python3.10", config.pyScriptBasePath() + "predict.py", config.pyScriptBasePath(), outFileName, jsonDocMap);
+            EvaluationHelper.executeExternalCmd(LOGGER, "python3.10", config.pyScriptBasePath() + "multilabel_predict.py", config.modelPath(), outFileName, jsonDocMap);
             Map<String,Object> result = objectMapper.readValue(new File(outFileName), LinkedHashMap.class);
             
             EvaluationSummary summary = createEvaluationSummary(result, termsToBeEvaluated);
@@ -99,14 +102,19 @@ public class GDPRModelEvaluator implements ModelEvaluator {
 				LOGGER.severe(String.format("No matching term found for evaluated %s", k));
 				throw new IllegalStateException(String.format("No matching term found for evaluated %s", k));
 			}
-			Map<String, String> predictions = (Map<String, String>) v;
+			Map<String, Map<String, String>> predictions = (Map<String, Map<String, String>>) v;
 			predictions.forEach((doc, pred) -> {
 				Evaluation evaluation = evaluatedTerm.getEvaluations().stream().filter(e -> e.getInput().equals(doc)).findFirst().orElse(null);
 				if(evaluation == null) {
 					LOGGER.severe(String.format("No matching evaluation doc found for evaluated %s", doc));
 					throw new IllegalStateException(String.format("No matching evaluation doc found for evaluated %s", doc));
 				}
-				evaluation.setRelevanceLevel(RelevanceLevelType.valueOf(pred));
+				pred.forEach((category, level) -> {
+					Relevance relevance = MDPEvaluationFactory.eINSTANCE.createRelevance();
+					relevance.setCategory(category);
+					relevance.setLevel(RelevanceLevelType.valueOf(level));
+					evaluation.getRelevance().add(relevance);
+				});
 			});
 			summary.getEvaluatedTerms().add(evaluatedTerm);
 		});

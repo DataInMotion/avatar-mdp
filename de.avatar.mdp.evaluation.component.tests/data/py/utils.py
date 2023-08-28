@@ -10,10 +10,7 @@ import string
 import stringutils
 import string_utils.validation as suv
 
-from scipy.spatial import distance
-
 import json, codecs
-from datetime import datetime  
 import pandas as pd
 
 
@@ -48,7 +45,6 @@ class W2vVectorizer(object):
             self.dimensions = 0
         else:
             self.dimensions = len(w2v[next(iter(w2v))])
-        #print(self.dimensions)
 
     def fit(self, X, y):
         return self
@@ -56,11 +52,6 @@ class W2vVectorizer(object):
     #This gives you the glove vectors if the word is present in the glove vocaboulary, otherwise it gives you a 0s vector
     def transform(self, X):
         #X should be a series of lists of tokens
-        #for words in X:
-         #   print("------")
-          #  print(words)
-           # for w in words:
-            #    print("word : " + w) 
         return np.array([
             np.mean([self.w2v[w.encode("utf-8")] for w in words if w.encode("utf-8") in self.w2v]
                     or [np.zeros(self.dimensions)], axis=0) for words in X])
@@ -124,76 +115,6 @@ def lemmatize(word):
     lemmatizer = WordNetLemmatizer()
     return lemmatizer.lemmatize(word)
 
-#Compute the minimal distance between a test vectorized document and the training docs which all belong to the same category
-def computeMinDist(vectorized_test_doc, vectorized_train_set):
-    minDist = 99999.
-    for v in vectorized_train_set:
-        dist = distance.cosine(v, vectorized_test_doc)
-        if dist < minDist:
-            minDist = dist
-        if dist < 0:
-            print("Distance is < 0!! That should not happen!!")
-    return minDist
-
-# Given a set of test vectorized docs, their true labels and the set of vectorized train data, compute the vectors of min cosine dist 
-def computeDistances(features_test, test_labels, features):
-    distances_right = []
-    distances_wrong = []
-    i = 0
-    for v in features_test:
-        label = test_labels[i]
-        if label == 1:
-            distances_right.append(computeMinDist(v, features))
-        if label == -1:
-            distances_wrong.append(computeMinDist(v, features))
-        i = i+1
-    return [distances_right, distances_wrong]
-
-#Compute precision and recall given the vectors of distances from the train set of the privacy related test and no-related test 
-def computeAccuracyMatrix(distances_right, distances_wrong, threshold):
-    accuracy_matrix = []
-    num_true_positive = 0.
-    num_true_negative = 0.
-    num_false_positive = 0.
-    num_false_negative = 0.
-    for d in distances_right:
-        if d < threshold:
-            num_true_positive = num_true_positive + 1
-        else:
-            num_false_negative = num_false_negative + 1
-    for d in distances_wrong:
-        if d < threshold:
-            num_false_positive = num_false_positive + 1
-        else:
-            num_true_negative = num_true_negative + 1
-    precision = num_true_positive/(num_true_positive+num_false_positive)
-    recall = num_true_positive/(num_true_positive+num_false_negative)
-    accuracy = (num_true_positive+num_true_negative)/(num_true_positive+num_false_positive+num_true_negative+num_false_negative)
-    #print("Precision: " + str(precision))
-    #print("Recall: " + str(recall))
-    #print("Accuracy: " + str(accuracy))
-    accuracy_matrix.append(precision)
-    accuracy_matrix.append(recall)
-    accuracy_matrix.append(accuracy)
-    return accuracy_matrix
-
-# Finds the optimal threshold to discriminate data based on a certain vector distance
-def findOptimalThreshold(distances_right, distances_wrong):
-    maxAccuracy = 0.
-    bestThreshold = 0.
-    for t in range(1, 101):
-        threshold = t*0.01
-        accuracy_matrix = computeAccuracyMatrix(distances_right, distances_wrong, threshold)
-        if accuracy_matrix[2] >= maxAccuracy:
-            maxAccuracy = accuracy_matrix[2]
-            bestThreshold = threshold
-    return bestThreshold
-
-def isDistBelowThreshold(dist, threshold):
-    if dist < threshold:
-        return True
-    return False
-
 def loadJson(file_path):
     obj_text = codecs.open(file_path, 'r', encoding='utf-8').read()
     return json.loads(obj_text)
@@ -211,17 +132,17 @@ def adjustDictForUsing(loaded_dict):
     return dict
 
 def saveAsJson(file_path, dict):
-    json.dump(dict, codecs.open(file_path, 'w', encoding='utf-8'), indent = 4, sort_keys = True)
-
-def createGloVeDict(file_path):
-    glove_dict = {}
-    with open(file_path,'rb') as f:
+    json.dump(dict, codecs.open(file_path, 'w', encoding='utf-8'), indent = 4, sort_keys = False)
+    
+def getEmbeddingsDict(fileName):
+    embeddings_dict={}
+    with open(fileName,'rb') as f:
         for line in f:
             values = line.split()
             word = values[0]
             vector = np.asarray(values[1:], "float32")
-            glove_dict[word] = vector
-    return glove_dict
+            embeddings_dict[word] = vector
+    return embeddings_dict
 
 # Convert the n-dimensional array of the glove dict values into lists and the bytes keys into string, so the json library can store it
 def adjustDictForStoring(dict):
@@ -229,22 +150,6 @@ def adjustDictForStoring(dict):
     for word, vector in dict.items():
         dict_storing[word.decode("utf-8")] = fromVectorToList(vector)
     return dict_storing
-
-def computePredictions(test_set, vectorized_test, vectorized_train, loaded_threshold, loaded_threshold_upper_bound):
-    predictions = {}
-    i = 0
-    for doc in vectorized_test:
-        minDist = computeMinDist(doc, vectorized_train)
-        original_doc = test_set[i]
-        print(minDist)
-        if isDistBelowThreshold(minDist, loaded_threshold):
-            predictions[original_doc] = "RELEVANT"
-        elif isDistBelowThreshold(minDist, loaded_threshold_upper_bound):
-            predictions[original_doc] = "POTENTIALLY_RELEVANT"
-        else:
-            predictions[original_doc] = "NOT_RELEVANT"
-        i = i+1
-    return predictions
     
 def createDataFrame(category, docs):
     labels = []
@@ -260,18 +165,3 @@ def concatDataFrames(df1, df2):
     
 def saveDataFrame(fileName, df):
     df.to_excel(fileName, engine="odf", index=False)
-    
-#Filter for findDistanceUpperBound
-def count(threshold, distance):
-    if distance < threshold:
-        return True
-    return False
-
-#Find the value of cosine dist threshold which would select a portion (sensitivity) of all the related documents 
-def findDistanceUpperBound(distances, sensitivity):
-    distances.sort()
-    for t in range(0,11):
-        thresh = 0.1*t
-        num = len(list(filter(lambda x: count(thresh, x), distances)))
-        if num/len(distances) >= sensitivity:
-            return thresh

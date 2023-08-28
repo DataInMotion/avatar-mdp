@@ -29,7 +29,11 @@
     </genClasses>
     <genClasses ecoreClass="evaluation.ecore#//Evaluation">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute evaluation.ecore#//Evaluation/input"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute evaluation.ecore#//Evaluation/relevanceLevel"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference evaluation.ecore#//Evaluation/relevance"/>
+    </genClasses>
+    <genClasses ecoreClass="evaluation.ecore#//Relevance">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute evaluation.ecore#//Relevance/category"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute evaluation.ecore#//Relevance/level"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

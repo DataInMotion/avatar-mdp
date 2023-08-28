@@ -31,7 +31,7 @@ public class EvaluationHelper {
 			if(process.exitValue() != 0) {
 				try(InputStream is = process.getErrorStream()) {
 					System.out.println(new String( is.readAllBytes()));
-					LOGGER.severe(String.format("Process %s exit code != 0. Error stream is %s:", Arrays.toString(command), new String( is.readAllBytes())));
+					LOGGER.severe(String.format("Process %s exit code != 0. Error stream is: %s", Arrays.toString(command), new String(is.readAllBytes())));
 				}
 			}
 		} catch (InterruptedException | IOException e) {

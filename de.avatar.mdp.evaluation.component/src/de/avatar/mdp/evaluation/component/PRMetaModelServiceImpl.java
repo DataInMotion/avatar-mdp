@@ -11,10 +11,13 @@
  */
 package de.avatar.mdp.evaluation.component;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
@@ -34,7 +37,6 @@ import de.avatar.mdp.apis.api.PRMetaModelService;
 import de.avatar.mdp.evaluation.EvaluationSummary;
 import de.avatar.mdp.evaluation.RelevanceLevelType;
 import de.avatar.mdp.prmeta.EvaluationCriteriumType;
-import de.avatar.mdp.prmeta.EvaluationLevelType;
 import de.avatar.mdp.prmeta.PRClassifier;
 import de.avatar.mdp.prmeta.PRFeature;
 import de.avatar.mdp.prmeta.PRMetaFactory;
@@ -101,7 +103,7 @@ public class PRMetaModelServiceImpl implements PRMetaModelService {
 //		2a. If yes, modify the existing one, otherwise create a new one
 //		2b. If not, we have to set the package URI and we have to add a PRPackage with criterium NONE
 //		3. If yes, we have to check if a PRPackage for the same evaluation criterium exists
-//		4. If yes, we modify that PRPackage, otherwise we add a new one
+//		4. If yes, we substitute that PRPackage, otherwise we add a new one
 		
 //		1./2.
 		PRModel prModel = null;
@@ -118,9 +120,7 @@ public class PRMetaModelServiceImpl implements PRMetaModelService {
 		if(existingPRPackage != null) prModel.getPrPackage().remove(existingPRPackage);
 		
 //		Set evaluation criterium
-		PRPackage prPackage;
-		if(existingPRPackage == null) prPackage = PRMetaFactory.eINSTANCE.createPRPackage();
-		else prPackage = existingPRPackage;
+		PRPackage prPackage = PRMetaFactory.eINSTANCE.createPRPackage();
 		prPackage.setEvaluationCriterium(EvaluationCriteriumType.getByName(evaluationSummary.getEvaluationCriterium().getName()));
 		prPackage.setEPackage((EPackage) proxifyEObject(ePackage, ePackage.getNsURI()));
 		
@@ -132,20 +132,29 @@ public class PRMetaModelServiceImpl implements PRMetaModelService {
 			}
 			PRFeature prFeature = PRMetaFactory.eINSTANCE.createPRFeature();
 			prFeature.setFeature((EStructuralFeature) proxifyEObject(feature, ePackage.getNsURI()));
-			RelevanceLevelType featureRelevance = et.getEvaluations().stream()
-					.map(e -> e.getRelevanceLevel())
-					.filter(rl -> rl.equals(RelevanceLevelType.RELEVANT))
-					.findAny().orElse(RelevanceLevelType.NOT_RELEVANT);
-			if(featureRelevance == RelevanceLevelType.NOT_RELEVANT) {
-				featureRelevance = et.getEvaluations().stream()
-						.map(e -> e.getRelevanceLevel())
-						.filter(rl -> rl.equals(RelevanceLevelType.POTENTIALLY_RELEVANT))
-						.findAny().orElse(RelevanceLevelType.NOT_RELEVANT);
-			}
-					
-			prFeature.setEvaluationLevel(EvaluationLevelType.get(featureRelevance.getLiteral()));
-			EClassifier eClassifier = ePackage.getEClassifier(et.getFeatureClassifierName());
+			Map<String, de.avatar.mdp.prmeta.RelevanceLevelType> relevanceMap = new HashMap<>();
+			et.getEvaluations().forEach(evaluation -> {
+				evaluation.getRelevance().forEach(relevance -> {
+					if(!relevanceMap.containsKey(relevance.getCategory())) relevanceMap.put(relevance.getCategory(), de.avatar.mdp.prmeta.RelevanceLevelType.NOT_RELEVANT);
+					if(relevance.getLevel().equals(RelevanceLevelType.POTENTIALLY_RELEVANT) && relevanceMap.get(relevance.getCategory()).equals(de.avatar.mdp.prmeta.RelevanceLevelType.NOT_RELEVANT)) {
+						relevanceMap.put(relevance.getCategory(), de.avatar.mdp.prmeta.RelevanceLevelType.POTENTIALLY_RELEVANT);
+					}
+					else if(relevance.getLevel().equals(RelevanceLevelType.RELEVANT) && 
+							(relevanceMap.get(relevance.getCategory()).equals(de.avatar.mdp.prmeta.RelevanceLevelType.NOT_RELEVANT) || 
+									relevanceMap.get(relevance.getCategory()).equals(de.avatar.mdp.prmeta.RelevanceLevelType.POTENTIALLY_RELEVANT))) {
+						relevanceMap.put(relevance.getCategory(), de.avatar.mdp.prmeta.RelevanceLevelType.RELEVANT);
+					}
+				});
+			});
+			relevanceMap.forEach((category, level) -> {
+				de.avatar.mdp.prmeta.Relevance relevance = PRMetaFactory.eINSTANCE.createRelevance();
+				relevance.setCategory(category);
+				relevance.setLevel(level);
+				prFeature.getRelevance().add(relevance);
+			});
+			relevanceMap.clear();
 			
+			EClassifier eClassifier = ePackage.getEClassifier(et.getFeatureClassifierName());	
 			PRClassifier prClassifier = prPackage.getPrClassifier().stream().filter(c -> c.getEClassifier().equals(eClassifier)).findFirst().orElse(null);
 			if(prClassifier == null) {
 				prClassifier = PRMetaFactory.eINSTANCE.createPRClassifier();
@@ -153,28 +162,39 @@ public class PRMetaModelServiceImpl implements PRMetaModelService {
 			}
 			prClassifier.setEClassifier((EClassifier) proxifyEObject(eClassifier, ePackage.getNsURI()));
 			prClassifier.getPrFeature().add(prFeature);
-			
-			EvaluationLevelType classifierRelevance = 
-					prClassifier.getPrFeature().stream()
-						.map(prf -> prf.getEvaluationLevel())
-						.filter(el -> el.equals(EvaluationLevelType.RELEVANT))
-						.findAny().orElse(EvaluationLevelType.NOT_RELEVANT);
-			if(classifierRelevance == EvaluationLevelType.NOT_RELEVANT) {
-				classifierRelevance = 
-						prClassifier.getPrFeature().stream()
-							.map(prf -> prf.getEvaluationLevel())
-							.filter(el -> el.equals(EvaluationLevelType.POTENTIALLY_RELEVANT))
-							.findAny().orElse(EvaluationLevelType.NOT_RELEVANT);
-			}
-			prClassifier.setEvaluationLevel(classifierRelevance);
 		});
 		
+		adjustClassifierRelevance(prPackage.getPrClassifier());
 		prModel.getPrPackage().add(prPackage);
 		savePRModel(prModel);
 		return prModel;
 	}
 
 	
+	private void adjustClassifierRelevance(EList<PRClassifier> prClassifier) {
+		Map<String, de.avatar.mdp.prmeta.RelevanceLevelType> relevanceMap = new HashMap<>();
+		prClassifier.forEach(cl -> {
+			cl.getPrFeature().forEach(f -> {
+				f.getRelevance().forEach(r -> {
+					if(!relevanceMap.containsKey(r.getCategory())) relevanceMap.put(r.getCategory(), de.avatar.mdp.prmeta.RelevanceLevelType.NOT_RELEVANT);
+					if(r.getLevel().equals(de.avatar.mdp.prmeta.RelevanceLevelType.POTENTIALLY_RELEVANT) && relevanceMap.get(r.getCategory()).equals(de.avatar.mdp.prmeta.RelevanceLevelType.NOT_RELEVANT) ) {
+						relevanceMap.put(r.getCategory(), r.getLevel());
+					} else if(r.getLevel().equals(de.avatar.mdp.prmeta.RelevanceLevelType.RELEVANT) && (relevanceMap.get(r.getCategory()).equals(de.avatar.mdp.prmeta.RelevanceLevelType.NOT_RELEVANT) || relevanceMap.get(r.getCategory()).equals(de.avatar.mdp.prmeta.RelevanceLevelType.POTENTIALLY_RELEVANT))) {
+						relevanceMap.put(r.getCategory(), r.getLevel());
+					}
+				});
+			});
+			relevanceMap.forEach((category, level) -> {
+				de.avatar.mdp.prmeta.Relevance prRelevance = PRMetaFactory.eINSTANCE.createRelevance();
+				prRelevance.setCategory(category);
+				prRelevance.setLevel(level);
+				cl.getRelevance().add(prRelevance);
+			});
+			relevanceMap.clear();
+		});
+		
+	}
+
 	private PRPackage createPRPackageWOCriterium(EPackage ePackage) {
 		PRPackage prPackage = PRMetaFactory.eINSTANCE.createPRPackage();
 		prPackage.setEPackage((EPackage) proxifyEObject(ePackage, ePackage.getNsURI()));
@@ -182,7 +202,10 @@ public class PRMetaModelServiceImpl implements PRMetaModelService {
 		ePackage.getEClassifiers().forEach(ec -> {
 			PRClassifier prClassifier = PRMetaFactory.eINSTANCE.createPRClassifier();
 			prClassifier.setEClassifier((EClassifier)proxifyEObject(ec, ePackage.getNsURI()));
-			prClassifier.setEvaluationLevel(EvaluationLevelType.NOT_RELEVANT);
+			de.avatar.mdp.prmeta.Relevance prRelevance = PRMetaFactory.eINSTANCE.createRelevance();
+			prRelevance.setCategory("NONE");
+			prRelevance.setLevel(de.avatar.mdp.prmeta.RelevanceLevelType.NOT_RELEVANT);
+			prClassifier.getRelevance().add(prRelevance);
 			if(ec instanceof EClass eclass) {
 				eclass.getEAllStructuralFeatures().forEach(sf -> {
 					if(sf.eIsProxy()) {
@@ -190,7 +213,10 @@ public class PRMetaModelServiceImpl implements PRMetaModelService {
 					}
 					PRFeature prFeature = PRMetaFactory.eINSTANCE.createPRFeature();
 					prFeature.setFeature((EStructuralFeature)proxifyEObject(sf, ePackage.getNsURI()));
-					prFeature.setEvaluationLevel(EvaluationLevelType.NOT_RELEVANT);
+					de.avatar.mdp.prmeta.Relevance relevance = PRMetaFactory.eINSTANCE.createRelevance();
+					relevance.setCategory("NONE");
+					relevance.setLevel(de.avatar.mdp.prmeta.RelevanceLevelType.NOT_RELEVANT);
+					prFeature.getRelevance().add(relevance);
 					prClassifier.getPrFeature().add(prFeature);
 				});
 			}

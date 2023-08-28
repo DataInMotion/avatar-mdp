@@ -12,8 +12,11 @@
 package de.avatar.mdp.apis.api;
 
 import java.util.List;
+import java.util.Map;
 
 import org.osgi.annotation.versioning.ProviderType;
+
+import de.avatar.mdp.evaluation.Relevance;
 
 /**
  * 
@@ -23,14 +26,5 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface ModelSuggesterRetrainer {
 
-	/**
-	 * For now we take as input simply a list of documents that have to be considered as relevant
-	 * based on the criterium we want to retrain the model on, and a list of unrelevant docs.
-	 * In the future this might be substituted by an own model, which would be a sort of additional 
-	 * model, coupled with whatever model we evaluated
-	 * 
-	 * @param pertinentDocs
-	 * @param unrelevantDocs
-	 */
-	void retrainModelSuggester(List<String> pertinentDocs, List<String> unrelevantDocs);
+	void retrainModelSuggester(Map<String, List<Relevance>> relevanceMap);
 }

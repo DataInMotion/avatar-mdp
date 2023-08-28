@@ -18,7 +18,12 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Evaluation">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="input" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="relevanceLevel" eType="#//RelevanceLevelType"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="relevance" upperBound="-1"
+        eType="#//Relevance" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Relevance">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="category" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="level" eType="#//RelevanceLevelType"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EEnum" name="EvaluationCriteriumType">
     <eLiterals name="GDPR"/>

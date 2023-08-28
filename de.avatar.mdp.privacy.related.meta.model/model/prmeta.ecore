@@ -21,13 +21,19 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="PRClassifier">
     <eStructuralFeatures xsi:type="ecore:EReference" name="eClassifier" eType="ecore:EClass ../../org.eclipse.emf.ecore/model/Ecore.ecore#//EClassifier"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="evaluationLevel" eType="#//EvaluationLevelType"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="prFeature" upperBound="-1"
         eType="#//PRFeature" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="relevance" upperBound="-1"
+        eType="#//Relevance" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="PRFeature">
     <eStructuralFeatures xsi:type="ecore:EReference" name="feature" eType="ecore:EClass ../../org.eclipse.emf.ecore/model/Ecore.ecore#//EStructuralFeature"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="evaluationLevel" eType="#//EvaluationLevelType"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="relevance" upperBound="-1"
+        eType="#//Relevance" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Relevance">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="category" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="level" eType="#//RelevanceLevelType"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EEnum" name="EvaluationCriteriumType">
     <eLiterals name="NONE"/>
@@ -35,7 +41,7 @@
     <eLiterals name="OPEN_DATA" value="2"/>
     <eLiterals name="OTHER" value="3"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EEnum" name="EvaluationLevelType">
+  <eClassifiers xsi:type="ecore:EEnum" name="RelevanceLevelType">
     <eLiterals name="NOT_RELEVANT"/>
     <eLiterals name="POTENTIALLY_RELEVANT" value="1"/>
     <eLiterals name="RELEVANT" value="2"/>

@@ -7,6 +7,8 @@
 	},
 	"GDPRModelEvaluator~test": {
 		"pyScriptBasePath": "./data/py/",
-		"outputBasePath": "./data/out/"
+		"outputBasePath": "./data/out/",
+		"modelPath": "./data/model/",
+		"basePath": "./data/"
 	}
 }

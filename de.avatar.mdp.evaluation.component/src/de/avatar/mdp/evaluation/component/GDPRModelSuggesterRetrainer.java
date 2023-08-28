@@ -24,6 +24,7 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.avatar.mdp.apis.api.ModelSuggesterRetrainer;
+import de.avatar.mdp.evaluation.Relevance;
 import de.avatar.mdp.evaluation.component.helper.EvaluationHelper;
 
 /**
@@ -37,7 +38,8 @@ public class GDPRModelSuggesterRetrainer implements ModelSuggesterRetrainer {
 	private static final Logger LOGGER = Logger.getLogger(GDPRModelSuggesterRetrainer.class.getName());
 
 	public @interface GDPRModelSuggesterRetrainerConfig {
-		String pyScriptBasePath() default ""; 
+		String pyScriptBasePath() default "./py/"; 
+		String basePath() default "./";
 	}
 
 	private GDPRModelSuggesterRetrainerConfig config;
@@ -47,31 +49,39 @@ public class GDPRModelSuggesterRetrainer implements ModelSuggesterRetrainer {
 		this.config = config;
 	}
 
-
 	/* 
 	 * (non-Javadoc)
-	 * @see de.avatar.mdp.apis.api.ModelSuggesterRetrainer#retrainModelSuggester(java.util.List, java.util.List)
+	 * @see de.avatar.mdp.apis.api.ModelSuggesterRetrainer#retrainModelSuggester(java.util.Map)
 	 */
 	@Override
-	public void retrainModelSuggester(List<String> pertinentDocs, List<String> unrelevantDocs) {
-		Map<String, List<String>> retrainedDocMap = createRetrainDocMap(pertinentDocs, unrelevantDocs);
+	public void retrainModelSuggester(Map<String, List<Relevance>> relevanceMap) {
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
-			String jsonDocMap = objectMapper.writeValueAsString(retrainedDocMap);
-			EvaluationHelper.executeExternalCmd(LOGGER, "python3.10", config.pyScriptBasePath() + "retrain.py", config.pyScriptBasePath(), jsonDocMap);
+			Map<String, Map<String, String>> docMap = createDocMap(relevanceMap);
+			String jsonDocMap = objectMapper.writeValueAsString(docMap);
+			EvaluationHelper.executeExternalCmd(LOGGER, "python3.10", config.pyScriptBasePath() + "multilabel_retrain.py", config.basePath(), jsonDocMap);
 		} catch (IOException e) {
 			LOGGER.severe(String.format("Exception while retraining GDPR suggester: %s", e.getMessage()));
 			e.printStackTrace();
 		}
 	}
 
-
-
-	private Map<String, List<String>> createRetrainDocMap(List<String> pertinentDocs, List<String> unrelevantDocs) {
-		Map<String, List<String>> retrainedDocMap = new HashMap<>();
-		retrainedDocMap.put("IDENTITY", pertinentDocs);
-		retrainedDocMap.put("NO-RELATED", unrelevantDocs);
-		return retrainedDocMap;
+	/**
+	 * We want it in the form of 
+	 * {"doc1": {"PERSONAL": "RELEVANT", "MEDICAL": "NOT_RELEVANT"}, "doc2": {"PERSONAL": "POTENTIALLY_RELEVANT", "MEDICAL": "RELEVANT"}}
+	 * @param relevanceMap
+	 * @return
+	 */
+	private Map<String, Map<String, String>> createDocMap(Map<String, List<Relevance>> relevanceMap) {
+		Map<String, Map<String, String>> docMap = new HashMap<>();
+		relevanceMap.forEach((doc, relevances) -> {
+			Map<String, String> relMap = new HashMap<>();
+			relevances.forEach(relevance -> {
+				relMap.put(relevance.getCategory(), relevance.getLevel().toString());
+			});
+			docMap.put(doc, relMap);
+		});
+		return docMap;
 	}
 
 }
