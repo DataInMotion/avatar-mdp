@@ -25,6 +25,9 @@ import java.util.logging.Logger;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EDataType;
+import org.eclipse.emf.ecore.EEnum;
+import org.eclipse.emf.ecore.ENamedElement;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -74,7 +77,7 @@ public class GDPRModelEvaluator implements ModelEvaluator {
         try {
         	Map<String, List<String>> featureNameDocMap = new LinkedHashMap<>();
         	termsToBeEvaluated
-        		.forEach(t -> featureNameDocMap.put(t.getFeatureClassifierName().concat("::").concat(t.getEvaluatedFeature().getName()), 
+        		.forEach(t -> featureNameDocMap.put(t.getElementClassifierName().concat("::").concat(t.getEvaluatedModelElement().getName()), 
         			t.getEvaluations().stream().map(e -> e.getInput()).toList()));
             String jsonDocMap = objectMapper.writeValueAsString(featureNameDocMap);
             LocalDateTime date = LocalDateTime.now();
@@ -82,7 +85,6 @@ public class GDPRModelEvaluator implements ModelEvaluator {
             String outFileName = config.outputBasePath() + ePackage.getName() + "_" + dateStr +".json";
             EvaluationHelper.executeExternalCmd(LOGGER, "python3.10", config.pyScriptBasePath() + "multilabel_predict.py", config.modelPath(), outFileName, jsonDocMap);
             Map<String,Object> result = objectMapper.readValue(new File(outFileName), LinkedHashMap.class);
-            
             EvaluationSummary summary = createEvaluationSummary(result, termsToBeEvaluated);
             return summary;
         } catch (IOException e) {
@@ -97,7 +99,7 @@ public class GDPRModelEvaluator implements ModelEvaluator {
 		EvaluationSummary summary = MDPEvaluationFactory.eINSTANCE.createEvaluationSummary();
 		summary.setEvaluationCriterium(EvaluationCriteriumType.GDPR);
 		modelPredictions.forEach((k,v) -> {
-			EvaluatedTerm evaluatedTerm = termsList.stream().filter(t -> t.getFeatureClassifierName().concat("::").concat(t.getEvaluatedFeature().getName()).equals(k)).findFirst().orElse(null);
+			EvaluatedTerm evaluatedTerm = termsList.stream().filter(t -> t.getElementClassifierName().concat("::").concat(t.getEvaluatedModelElement().getName()).equals(k)).findFirst().orElse(null);
 			if(evaluatedTerm == null) {
 				LOGGER.severe(String.format("No matching term found for evaluated %s", k));
 				throw new IllegalStateException(String.format("No matching term found for evaluated %s", k));
@@ -126,28 +128,38 @@ public class GDPRModelEvaluator implements ModelEvaluator {
 		ePackage.getEClassifiers().forEach(classifier -> {
 			if(classifier instanceof EClass eClass) {
 				eClass.getEAllStructuralFeatures().forEach(feature -> {
-					List<String> docs = new ArrayList<>();
-					docs.add(feature.getName());
-					String featureDoc = extractElementDocumentation(feature.getEAnnotation(MODEL_ANNOTATION_SOURCE)); 
-					if(featureDoc != null) {
-						docs.add(featureDoc);	
-					}
-					EvaluatedTerm term = MDPEvaluationFactory.eINSTANCE.createEvaluatedTerm();
-					URI uri = EcoreUtil.getURI(feature);
-					InternalEObject internalEObj = (InternalEObject) feature;
-					internalEObj.eSetProxyURI(uri);
-					term.setEvaluatedFeature(feature);
-					term.setFeatureClassifierName(eClass.getName());
-					docs.forEach(doc -> {
-						Evaluation evaluation = MDPEvaluationFactory.eINSTANCE.createEvaluation();
-						evaluation.setInput(doc);
-						term.getEvaluations().add(evaluation);
-					});
-					evaluatedTerms.add(term);
+					evaluatedTerms.add(doCreateEvaluatedTerm(feature, eClass.getName()));
 				});
 			} 
+			else if(classifier instanceof EEnum eEnum) {
+				eEnum.getELiterals().forEach(literal -> {
+					evaluatedTerms.add(doCreateEvaluatedTerm(literal, eEnum.getName()));			
+				});
+			}
+			else if(classifier instanceof EDataType eDataType) {
+				evaluatedTerms.add(doCreateEvaluatedTerm(eDataType, eDataType.getName()));	
+			}
 		});		
 		return evaluatedTerms;
+	}
+	
+	private EvaluatedTerm doCreateEvaluatedTerm(ENamedElement element, String eClassifierName) {
+		List<String> docs = new ArrayList<>();
+		docs.add(element.getName());
+		String dataTypeDoc = extractElementDocumentation(element.getEAnnotation(MODEL_ANNOTATION_SOURCE)); 
+		if(dataTypeDoc != null) docs.add(dataTypeDoc);
+		EvaluatedTerm term = MDPEvaluationFactory.eINSTANCE.createEvaluatedTerm();
+		URI uri = EcoreUtil.getURI(element);
+		InternalEObject internalEObj = (InternalEObject) element;
+		internalEObj.eSetProxyURI(uri);
+		term.setEvaluatedModelElement(element);
+		term.setElementClassifierName(eClassifierName);
+		docs.forEach(doc -> {
+			Evaluation evaluation = MDPEvaluationFactory.eINSTANCE.createEvaluation();
+			evaluation.setInput(doc);
+			term.getEvaluations().add(evaluation);
+		});
+		return term;
 	}
 	
 	private String extractElementDocumentation(EAnnotation annotation) {

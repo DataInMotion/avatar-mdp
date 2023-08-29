@@ -46,7 +46,7 @@ import de.avatar.mdp.evaluation.Relevance;
 import de.avatar.mdp.evaluation.RelevanceLevelType;
 import de.avatar.mdp.prmeta.EvaluationCriteriumType;
 import de.avatar.mdp.prmeta.PRClassifier;
-import de.avatar.mdp.prmeta.PRFeature;
+import de.avatar.mdp.prmeta.PRModelElement;
 import de.avatar.mdp.prmeta.PRModel;
 import de.avatar.mdp.prmeta.PRPackage;
 
@@ -192,24 +192,24 @@ public class PRMetaModelServiceTest {
 		assertThat(prc1.getRelevance().get(0).getLevel()).isEqualTo(de.avatar.mdp.prmeta.RelevanceLevelType.RELEVANT);
 		
 		assertThat(prc2.getRelevance()).hasSize(1);
-		assertThat(prc2.getRelevance().get(0)).isEqualTo(de.avatar.mdp.prmeta.RelevanceLevelType.NOT_RELEVANT);
+		assertThat(prc2.getRelevance().get(0).getLevel()).isEqualTo(de.avatar.mdp.prmeta.RelevanceLevelType.NOT_RELEVANT);
 				
-		assertThat(prc1.getPrFeature()).hasSize(1);
-		assertThat(prc2.getPrFeature()).hasSize(1);
+		assertThat(prc1.getPrModelElement()).hasSize(1);
+		assertThat(prc2.getPrModelElement()).hasSize(1);
 
-		PRFeature prf1 = prc1.getPrFeature().get(0);
+		PRModelElement prf1 = prc1.getPrModelElement().get(0);
 		
 		assertThat(prf1.getRelevance()).hasSize(1);
-		assertThat(prf1.getRelevance().get(0)).isEqualTo(de.avatar.mdp.prmeta.RelevanceLevelType.RELEVANT);
-		assertTrue(prf1.getFeature().eIsProxy());
-		EStructuralFeature sf1 = (EStructuralFeature) EcoreUtil.resolve(prf1.getFeature(), prModel);
+		assertThat(prf1.getRelevance().get(0).getLevel()).isEqualTo(de.avatar.mdp.prmeta.RelevanceLevelType.RELEVANT);
+		assertTrue(prf1.getModelElement().eIsProxy());
+		EStructuralFeature sf1 = (EStructuralFeature) EcoreUtil.resolve(prf1.getModelElement(), prModel);
 		assertThat(sf1.getName()).isEqualTo(BasicPackage.eINSTANCE.getAddress_City().getName());
 		
-		PRFeature prf2 = prc2.getPrFeature().get(0);
+		PRModelElement prf2 = prc2.getPrModelElement().get(0);
 		assertThat(prf2.getRelevance()).hasSize(1);
-		assertThat(prf2.getRelevance().get(0)).isEqualTo(de.avatar.mdp.prmeta.RelevanceLevelType.NOT_RELEVANT);
-		assertTrue(prf2.getFeature().eIsProxy());
-		EStructuralFeature sf2 = (EStructuralFeature) EcoreUtil.resolve(prf2.getFeature(), prModel);
+		assertThat(prf2.getRelevance().get(0).getLevel()).isEqualTo(de.avatar.mdp.prmeta.RelevanceLevelType.NOT_RELEVANT);
+		assertTrue(prf2.getModelElement().eIsProxy());
+		EStructuralFeature sf2 = (EStructuralFeature) EcoreUtil.resolve(prf2.getModelElement(), prModel);
 		assertThat(sf2.getName()).isEqualTo(model.getContact_Context().getName());		
 	}
 
@@ -222,8 +222,8 @@ public class PRMetaModelServiceTest {
 		URI uri1 = EcoreUtil.getURI(f1);
 		InternalEObject ieo1 = (InternalEObject) f1;
 		ieo1.eSetProxyURI(uri1);
-		term1.setEvaluatedFeature(f1);
-		term1.setFeatureClassifierName(BasicPackage.eINSTANCE.getAddress().getName());
+		term1.setEvaluatedModelElement(f1);
+		term1.setElementClassifierName(BasicPackage.eINSTANCE.getAddress().getName());
 		Evaluation e11 = MDPEvaluationFactory.eINSTANCE.createEvaluation();
 		e11.setInput("city");
 		Relevance relevance = MDPEvaluationFactory.eINSTANCE.createRelevance();
@@ -244,8 +244,8 @@ public class PRMetaModelServiceTest {
 		URI uri2 = EcoreUtil.getURI(f2);
 		InternalEObject ieo2 = (InternalEObject) f2;
 		ieo2.eSetProxyURI(uri2);
-		term2.setEvaluatedFeature(f2);
-		term2.setFeatureClassifierName(BasicPackage.eINSTANCE.getContact().getName());
+		term2.setEvaluatedModelElement(f2);
+		term2.setElementClassifierName(BasicPackage.eINSTANCE.getContact().getName());
 		Evaluation e21 = MDPEvaluationFactory.eINSTANCE.createEvaluation();
 		e21.setInput("context");
 		Relevance relevance3 = MDPEvaluationFactory.eINSTANCE.createRelevance();
