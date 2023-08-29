@@ -23,8 +23,8 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference evaluation.ecore#//EvaluationSummary/evaluatedTerms"/>
     </genClasses>
     <genClasses ecoreClass="evaluation.ecore#//EvaluatedTerm">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference evaluation.ecore#//EvaluatedTerm/evaluatedFeature"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute evaluation.ecore#//EvaluatedTerm/featureClassifierName"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference evaluation.ecore#//EvaluatedTerm/evaluatedModelElement"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute evaluation.ecore#//EvaluatedTerm/elementClassifierName"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference evaluation.ecore#//EvaluatedTerm/evaluations"/>
     </genClasses>
     <genClasses ecoreClass="evaluation.ecore#//Evaluation">

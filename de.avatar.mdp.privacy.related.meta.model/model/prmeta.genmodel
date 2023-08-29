@@ -31,12 +31,12 @@
     </genClasses>
     <genClasses ecoreClass="prmeta.ecore#//PRClassifier">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRClassifier/eClassifier"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRClassifier/prFeature"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRClassifier/prModelElement"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRClassifier/relevance"/>
     </genClasses>
-    <genClasses ecoreClass="prmeta.ecore#//PRFeature">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRFeature/feature"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRFeature/relevance"/>
+    <genClasses ecoreClass="prmeta.ecore#//PRModelElement">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRModelElement/modelElement"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRModelElement/relevance"/>
     </genClasses>
     <genClasses ecoreClass="prmeta.ecore#//Relevance">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute prmeta.ecore#//Relevance/category"/>
