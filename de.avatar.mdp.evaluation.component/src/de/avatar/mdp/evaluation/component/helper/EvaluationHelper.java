@@ -14,6 +14,7 @@ package de.avatar.mdp.evaluation.component.helper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -30,13 +31,13 @@ public class EvaluationHelper {
 			process.waitFor();
 			if(process.exitValue() != 0) {
 				try(InputStream is = process.getErrorStream()) {
-					System.out.println(new String( is.readAllBytes()));
-					LOGGER.severe(String.format("Process %s exit code != 0. Error stream is: %s", Arrays.toString(command), new String(is.readAllBytes())));
+					String errMsg = new String( is.readAllBytes());
+					LOGGER.severe(String.format("Process %s exit code != 0", Arrays.toString(command)));
+					throw new IllegalStateException(errMsg);
 				}
 			}
 		} catch (InterruptedException | IOException e) {
-			LOGGER.severe(String.format("Exception while waiting for command %s: %s", Arrays.toString(command), e.getMessage()));
-			e.printStackTrace();
+			LOGGER.log(Level.SEVERE, String.format("Exception while waiting for command %s", Arrays.toString(command)), e);
 		}
 	}
 }

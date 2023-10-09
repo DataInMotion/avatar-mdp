@@ -28,6 +28,7 @@
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRPackage/ePackage"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute prmeta.ecore#//PRPackage/evaluationCriterium"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRPackage/prClassifier"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute prmeta.ecore#//PRPackage/evaluationModelUsed"/>
     </genClasses>
     <genClasses ecoreClass="prmeta.ecore#//PRClassifier">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRClassifier/eClassifier"/>
@@ -37,6 +38,7 @@
     <genClasses ecoreClass="prmeta.ecore#//PRModelElement">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRModelElement/modelElement"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference prmeta.ecore#//PRModelElement/relevance"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute prmeta.ecore#//PRModelElement/negationDetected"/>
     </genClasses>
     <genClasses ecoreClass="prmeta.ecore#//Relevance">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute prmeta.ecore#//Relevance/category"/>

@@ -216,6 +216,7 @@ public class PRMetaModelServiceTest {
 	private EvaluationSummary createTestEvaluationSummary() {
 		EvaluationSummary summary = MDPEvaluationFactory.eINSTANCE.createEvaluationSummary();
 		summary.setEvaluationCriterium(de.avatar.mdp.evaluation.EvaluationCriteriumType.GDPR);
+		summary.setEvaluationModelUsed("multilabel_v2");
 		
 		EvaluatedTerm term1 = MDPEvaluationFactory.eINSTANCE.createEvaluatedTerm();
 		EStructuralFeature f1 = BasicPackage.eINSTANCE.getAddress_City();
@@ -229,6 +230,7 @@ public class PRMetaModelServiceTest {
 		Relevance relevance = MDPEvaluationFactory.eINSTANCE.createRelevance();
 		relevance.setLevel(RelevanceLevelType.RELEVANT);
 		relevance.setCategory("MEDICAL");
+		e11.setNegationDetected(false);
 		e11.getRelevance().add(relevance);
 		Evaluation e12 = MDPEvaluationFactory.eINSTANCE.createEvaluation();
 		e12.setInput("The city of the customer");

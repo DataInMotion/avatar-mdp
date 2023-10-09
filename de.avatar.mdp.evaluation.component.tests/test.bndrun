@@ -56,4 +56,5 @@
 	de.avatar.mdp.evaluation.model;version=snapshot,\
 	de.avatar.mdp.privacy.related.meta.model;version=snapshot,\
 	org.osgi.test.junit5.cm;version='[1.2.1,1.2.2)',\
-	org.gecko.emf.osgi.example.model.basic;version='[5.0.0,5.0.1)'
+	org.gecko.emf.osgi.example.model.basic;version='[5.0.0,5.0.1)',\
+	de.avatar.mdp.medical.record.example.model;version=snapshot

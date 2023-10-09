@@ -119,11 +119,12 @@ public class PRMetaModelServiceImpl implements PRMetaModelService {
 		
 //		3./4.
 		PRPackage existingPRPackage = prModel.getPrPackage().stream().filter(p -> p.getEvaluationCriterium().getLiteral().equals(evaluationSummary.getEvaluationCriterium().getLiteral())).findFirst().orElse(null);
-		if(existingPRPackage != null) prModel.getPrPackage().remove(existingPRPackage);
+		if(existingPRPackage != null && existingPRPackage.getEvaluationModelUsed().equals(evaluationSummary.getEvaluationModelUsed())) prModel.getPrPackage().remove(existingPRPackage);
 		
 //		Set evaluation criterium
 		PRPackage prPackage = PRMetaFactory.eINSTANCE.createPRPackage();
 		prPackage.setEvaluationCriterium(EvaluationCriteriumType.getByName(evaluationSummary.getEvaluationCriterium().getName()));
+		prPackage.setEvaluationModelUsed(evaluationSummary.getEvaluationModelUsed());
 		prPackage.setEPackage((EPackage) proxifyEObject(ePackage, ePackage.getNsURI()));
 		
 //		Loop over the EvaluationSummary features and add the corresponding PRFeature to the PRModel
@@ -136,6 +137,7 @@ public class PRMetaModelServiceImpl implements PRMetaModelService {
 			prModelElement.setModelElement((ENamedElement) proxifyEObject(evaluatedModelElement, ePackage.getNsURI()));
 			Map<String, de.avatar.mdp.prmeta.RelevanceLevelType> relevanceMap = new HashMap<>();
 			et.getEvaluations().forEach(evaluation -> {
+				if(evaluation.isNegationDetected()) prModelElement.setNegationDetected(true);
 				evaluation.getRelevance().forEach(relevance -> {
 					if(!relevanceMap.containsKey(relevance.getCategory())) relevanceMap.put(relevance.getCategory(), de.avatar.mdp.prmeta.RelevanceLevelType.NOT_RELEVANT);
 					if(relevance.getLevel().equals(RelevanceLevelType.POTENTIALLY_RELEVANT) && relevanceMap.get(relevance.getCategory()).equals(de.avatar.mdp.prmeta.RelevanceLevelType.NOT_RELEVANT)) {

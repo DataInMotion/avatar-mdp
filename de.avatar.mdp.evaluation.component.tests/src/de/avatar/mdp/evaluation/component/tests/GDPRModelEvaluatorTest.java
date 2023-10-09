@@ -52,11 +52,41 @@ public class GDPRModelEvaluatorTest {
 			properties = {
 					@Property(key = "basePath", value = "./data/"),
 					@Property(key = "modelPath", value = "./data/model/"),
-					@Property(key = "pyScriptBasePath", value = "./data/py/"),
-					@Property(key = "outputBasePath", value = "./data/out/")
+					@Property(key = "pyScriptBasePath", value = "./data/py/multilabel_v2/"),
+					@Property(key = "outputBasePath", value = "./data/out/"),
+					@Property(key = "modelName", value = "multilabel_v2")
 
 			})
-	public void test(@InjectService ServiceAware<ModelEvaluator> meAware, 
+	public void testSuggesterV2(@InjectService ServiceAware<ModelEvaluator> meAware, 
+			@InjectService ServiceAware<BasicPackage> packAware) {
+		assertThat(meAware).isNotNull();
+		ModelEvaluator evaluator = meAware.getService();
+		assertThat(evaluator).isNotNull();
+		
+		assertThat(packAware).isNotNull();
+		BasicPackage model = packAware.getService();
+		assertThat(model).isNotNull();
+		
+		EvaluationSummary summary = evaluator.evaluateModel(model);
+		assertThat(summary).isNotNull();
+		List<EvaluatedTerm> terms = summary.getEvaluatedTerms();
+		assertThat(terms).isNotEmpty();
+	}
+	
+	@Test
+	@WithFactoryConfiguration(
+			factoryPid = "GDPRModelEvaluator",
+			location = "?",
+			name = "test", 
+			properties = {
+					@Property(key = "basePath", value = "./data/"),
+					@Property(key = "modelPath", value = "./data/model/"),
+					@Property(key = "pyScriptBasePath", value = "./data/py/spacy/"),
+					@Property(key = "outputBasePath", value = "./data/out/"),
+					@Property(key = "modelName", value = "spacy_textcat_ner_negex")
+
+			})
+	public void testSuggesterSpacy(@InjectService ServiceAware<ModelEvaluator> meAware, 
 			@InjectService ServiceAware<BasicPackage> packAware) {
 		assertThat(meAware).isNotNull();
 		ModelEvaluator evaluator = meAware.getService();
