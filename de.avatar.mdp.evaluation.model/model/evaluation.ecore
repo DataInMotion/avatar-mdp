@@ -6,6 +6,11 @@
   </eAnnotations>
   <eClassifiers xsi:type="ecore:EClass" name="EvaluationSummary">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="evaluationCriterium" eType="#//EvaluationCriteriumType"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="evaluationModelUsed" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="In case we implement different suggesters for the same criterium, we specify here which model was used by the suggester."/>
+      </eAnnotations>
+    </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EReference" name="evaluatedTerms" upperBound="-1"
         eType="#//EvaluatedTerm" containment="true"/>
   </eClassifiers>
@@ -21,6 +26,17 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="input" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="relevance" upperBound="-1"
         eType="#//Relevance" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="negationDetected" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="This field is to mark whether or not the suggester has found that the input contains a negation, which might revert the relevance of the document. "/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="entities" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="When using Name Entity Recognition, this field will contains the entities found by the suggester. For instance, if the input is &quot;my address is xxxx&quot; and we are looking for instance pii, we should  ideally get xxxx as entity."/>
+      </eAnnotations>
+    </eStructuralFeatures>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Relevance">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="category" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>

@@ -5,10 +5,11 @@
 		"avatarmdp.databases": "avatarmdp",
 		"avatarmdp.avatarmdp.repoType": "PROTOTYPE"
 	},
-	"GDPRModelEvaluator~test": {
-		"pyScriptBasePath": "./data/py/",
+	"GDPRModelEvaluator~multilabel_v2": {
+		"pyScriptBasePath": "./data/py/multilabel_v2/",
 		"outputBasePath": "./data/out/",
 		"modelPath": "./data/model/",
-		"basePath": "./data/"
+		"basePath": "./data/",
+		"modelName": "multilabel_v2"
 	}
 }

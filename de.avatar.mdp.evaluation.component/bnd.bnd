@@ -9,5 +9,7 @@ Private-Package: de.avatar.mdp.evaluation.component
 	com.fasterxml.jackson.core.jackson-databind,\
 	com.fasterxml.jackson.core.jackson-core,\
 	org.gecko.emf.repository.api,\
-	org.osgi.service.component
+	org.osgi.service.component,\
+	org.osgi.util.promise,\
+	org.osgi.util.function
 -privatepackage: de.avatar.mdp.evaluation.component.helper

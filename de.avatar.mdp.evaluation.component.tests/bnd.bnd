@@ -13,7 +13,8 @@ Test-Cases: ${classes;HIERARCHY_INDIRECTLY_ANNOTATED;org.junit.platform.commons.
 	org.gecko.emf.osgi.example.model.basic,\
 	org.gecko.emf.repository.api,\
 	org.gecko.mongo.osgi.component,\
-	org.osgi.test.junit5.cm
+	org.osgi.test.junit5.cm,\
+	de.avatar.mdp.medical.record.example.model;version=latest
 	
 	
 Private-Package: de.avatar.mdp.evaluation.component.tests

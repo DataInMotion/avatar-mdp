@@ -20,6 +20,7 @@
     </genEnums>
     <genClasses ecoreClass="evaluation.ecore#//EvaluationSummary">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute evaluation.ecore#//EvaluationSummary/evaluationCriterium"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute evaluation.ecore#//EvaluationSummary/evaluationModelUsed"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference evaluation.ecore#//EvaluationSummary/evaluatedTerms"/>
     </genClasses>
     <genClasses ecoreClass="evaluation.ecore#//EvaluatedTerm">
@@ -30,6 +31,8 @@
     <genClasses ecoreClass="evaluation.ecore#//Evaluation">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute evaluation.ecore#//Evaluation/input"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference evaluation.ecore#//Evaluation/relevance"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute evaluation.ecore#//Evaluation/negationDetected"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute evaluation.ecore#//Evaluation/entities"/>
     </genClasses>
     <genClasses ecoreClass="evaluation.ecore#//Relevance">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute evaluation.ecore#//Relevance/category"/>
