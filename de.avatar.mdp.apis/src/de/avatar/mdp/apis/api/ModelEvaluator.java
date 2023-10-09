@@ -16,6 +16,11 @@ import org.osgi.annotation.versioning.ProviderType;
 
 import de.avatar.mdp.evaluation.EvaluationSummary;
 
+/**
+ * This service provider should be responsible of evaluating a meta model
+ * @author ilenia
+ * @since Oct 6, 2023
+ */
 @ProviderType
 public interface ModelEvaluator{
 
