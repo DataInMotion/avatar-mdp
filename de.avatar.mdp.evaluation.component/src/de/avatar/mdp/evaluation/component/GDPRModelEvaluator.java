@@ -38,7 +38,8 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import de.avatar.mdp.apis.api.ModelEvaluator;
+import de.avatar.mdp.apis.ModelEvaluator;
+import de.avatar.mdp.apis.config.SuggesterConfig;
 import de.avatar.mdp.evaluation.EvaluatedTerm;
 import de.avatar.mdp.evaluation.Evaluation;
 import de.avatar.mdp.evaluation.EvaluationCriteriumType;
@@ -56,20 +57,11 @@ public class GDPRModelEvaluator implements ModelEvaluator {
 	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd_HH:mm:ss.SSS");
 	private static final String NEGATION_DETECTED_CAT = "POSSIBLE_NEGATION";
 	private static final String PREDICTION_SCRIPT_SUFFIX = "_predict.py";
-	private static final String PYTHON_VERSION = "python3.10";
 	
-	public @interface GDPRModelEvaluatorConfig {
-		String basePath() default "./";
-		String modelPath() default "./model/";
-		String pyScriptBasePath() default "./py/";
-		String outputBasePath() default "./out/";
-		String modelName() default "";
-	}
-	
-	private GDPRModelEvaluatorConfig config;
+	private SuggesterConfig config;
 	
 	@Activate
-	public void activate(GDPRModelEvaluatorConfig config) {
+	public void activate(SuggesterConfig config) {
 		this.config = config;
 	}
 	
@@ -88,7 +80,7 @@ public class GDPRModelEvaluator implements ModelEvaluator {
             LocalDateTime date = LocalDateTime.now();
             String dateStr = date.format(DATE_TIME_FORMATTER);
             String outFileName = config.outputBasePath() + ePackage.getName() + "_" + config.modelName() + "_" + dateStr +".json";
-            EvaluationHelper.executeExternalCmd(LOGGER, PYTHON_VERSION, config.pyScriptBasePath() + config.modelName()+PREDICTION_SCRIPT_SUFFIX, config.modelPath(), outFileName, jsonDocMap);
+            EvaluationHelper.executeExternalCmd(LOGGER, "python"+config.pythonVersion(), config.pyScriptBasePath() + config.modelName()+PREDICTION_SCRIPT_SUFFIX, config.modelPath(), outFileName, jsonDocMap);
             Map<String,Object> result = objectMapper.readValue(new File(outFileName), LinkedHashMap.class);
             EvaluationSummary summary = createEvaluationSummary(result, termsToBeEvaluated);
             return summary;
@@ -103,6 +95,7 @@ public class GDPRModelEvaluator implements ModelEvaluator {
 		EvaluationSummary summary = MDPEvaluationFactory.eINSTANCE.createEvaluationSummary();
 		summary.setEvaluationCriterium(EvaluationCriteriumType.GDPR);
 		summary.setEvaluationModelUsed(config.modelName());
+		summary.setEvaluationTimestamp(System.currentTimeMillis());
 		modelPredictions.forEach((k,v) -> {
 			EvaluatedTerm evaluatedTerm = termsList.stream().filter(t -> t.getElementClassifierName().concat("::").concat(t.getEvaluatedModelElement().getName()).equals(k)).findFirst().orElse(null);
 			if(evaluatedTerm == null) {

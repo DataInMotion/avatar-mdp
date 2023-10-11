@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012 - 2018 Data In Motion and others.
+ * Copyright (c) 2012 - 2023 Data In Motion and others.
  * All rights reserved. 
  * 
  * This program and the accompanying materials are made available under the terms of the 
@@ -9,21 +9,22 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package de.avatar.mdp.apis.api;
+package de.avatar.mdp.apis;
 
-import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.EObject;
 import org.osgi.annotation.versioning.ProviderType;
 
 import de.avatar.mdp.evaluation.EvaluationSummary;
 
 /**
- * This service provider should be responsible of evaluating a meta model
+ * This service provider should be responsible for evaluating the instance of a model, 
+ * so an EObject
+ * 
  * @author ilenia
  * @since Oct 6, 2023
  */
 @ProviderType
-public interface ModelEvaluator{
+public interface EObjectEvaluator {
 
-	EvaluationSummary evaluateModel(EPackage ePackage);
-
+	EvaluationSummary evaluateEObject(EObject eObject);
 }

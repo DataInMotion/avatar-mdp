@@ -7,7 +7,9 @@
 	bnd.identity;id='org.gecko.emf.mongo.component',\
 	bnd.identity;id='org.mongodb.mongo-java-driver',\
 	bnd.identity;id='org.gecko.emf.repository.mongo',\
-	bnd.identity;id='org.gecko.mongo.osgi.component'
+	bnd.identity;id='org.gecko.mongo.osgi.component',\
+	bnd.identity;id='org.gecko.emf.mongo.pushstream',\
+	bnd.identity;id='org.gecko.emf.json'
 	
 -runbundles.test: \
 	de.avatar.mdp.evaluation.component.tests;version=snapshot
@@ -57,4 +59,15 @@
 	de.avatar.mdp.privacy.related.meta.model;version=snapshot,\
 	org.osgi.test.junit5.cm;version='[1.2.1,1.2.2)',\
 	org.gecko.emf.osgi.example.model.basic;version='[5.0.0,5.0.1)',\
-	de.avatar.mdp.medical.record.example.model;version=snapshot
+	de.avatar.mdp.medical.record.example.model;version=snapshot,\
+	org.gecko.emf.pushstreams;version='[1.1.1,1.1.2)',\
+	org.gecko.util.common;version='[2.0.0,2.0.1)',\
+	org.gecko.util.pushstream;version='[6.0.0,6.0.1)',\
+	org.osgi.util.pushstream;version='[1.0.0,1.0.1)',\
+	org.gecko.emf.mongo.pushstream;version='[6.0.6,6.0.7)',\
+	com.fasterxml.jackson.dataformat.jackson-dataformat-properties;version='[2.13.2,2.13.3)',\
+	com.fasterxml.jackson.dataformat.jackson-dataformat-yaml;version='[2.13.2,2.13.3)',\
+	com.fasterxml.jackson.datatype.jackson-datatype-jsr310;version='[2.13.2,2.13.3)',\
+	org.eclipse.emfcloud.emfjson-jackson;version='[2.1.0,2.1.1)',\
+	org.gecko.emf.json;version='[1.4.1,1.4.2)',\
+	org.yaml.snakeyaml;version='[1.30.0,1.30.1)'

@@ -21,6 +21,7 @@
     <genClasses ecoreClass="evaluation.ecore#//EvaluationSummary">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute evaluation.ecore#//EvaluationSummary/evaluationCriterium"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute evaluation.ecore#//EvaluationSummary/evaluationModelUsed"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute evaluation.ecore#//EvaluationSummary/evaluationTimestamp"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference evaluation.ecore#//EvaluationSummary/evaluatedTerms"/>
     </genClasses>
     <genClasses ecoreClass="evaluation.ecore#//EvaluatedTerm">

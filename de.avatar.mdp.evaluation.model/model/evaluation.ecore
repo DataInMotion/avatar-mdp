@@ -11,6 +11,7 @@
         <details key="documentation" value="In case we implement different suggesters for the same criterium, we specify here which model was used by the suggester."/>
       </eAnnotations>
     </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="evaluationTimestamp" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="evaluatedTerms" upperBound="-1"
         eType="#//EvaluatedTerm" containment="true"/>
   </eClassifiers>
@@ -20,7 +21,7 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="elementClassifierName"
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="evaluations" upperBound="-1"
-        eType="#//Evaluation"/>
+        eType="#//Evaluation" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Evaluation">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="input" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>

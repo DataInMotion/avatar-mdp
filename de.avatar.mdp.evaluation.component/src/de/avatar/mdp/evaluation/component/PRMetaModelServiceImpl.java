@@ -35,7 +35,7 @@ import org.osgi.service.component.ComponentServiceObjects;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import de.avatar.mdp.apis.api.PRMetaModelService;
+import de.avatar.mdp.apis.PRMetaModelService;
 import de.avatar.mdp.evaluation.EvaluationSummary;
 import de.avatar.mdp.evaluation.RelevanceLevelType;
 import de.avatar.mdp.prmeta.EvaluationCriteriumType;

@@ -9,28 +9,22 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package de.avatar.mdp.apis.api;
+package de.avatar.mdp.apis;
 
-import java.util.List;
-
-import org.eclipse.emf.ecore.EPackage;
 import org.osgi.annotation.versioning.ProviderType;
 
-import de.avatar.mdp.evaluation.EvaluationSummary;
-import de.avatar.mdp.prmeta.PRModel;
-
 /**
+ * This service provider should be responsible of evaluating EObjects from a db
+ * at startup. It should be responsibility of the config to set up from which db
+ * the EObjects have to be taken, which EObjects have to be evaluated and 
+ * according to which criteria.
  * 
  * @author ilenia
- * @since Aug 8, 2023
+ * @since Oct 11, 2023
  */
 @ProviderType
-public interface PRMetaModelService {
+public interface DBObjectsEvaluator {
+	
+	void evaluate();
 
-	List<PRModel> getPRModelByNsURI(String... modelNsURIs);
-	
-	void savePRModel(PRModel prModel);
-	
-	PRModel createPRModel(EvaluationSummary evaluationSummary, EPackage ePackage);
-	
 }

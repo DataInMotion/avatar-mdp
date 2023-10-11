@@ -20,13 +20,13 @@ import java.io.IOException;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EClassifier;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.gecko.emf.osgi.example.model.basic.BasicPackage;
 import org.gecko.emf.repository.EMFRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.osgi.test.common.annotation.InjectService;
@@ -37,7 +37,7 @@ import org.osgi.test.junit5.cm.ConfigurationExtension;
 import org.osgi.test.junit5.context.BundleContextExtension;
 import org.osgi.test.junit5.service.ServiceExtension;
 
-import de.avatar.mdp.apis.api.PRMetaModelService;
+import de.avatar.mdp.apis.PRMetaModelService;
 import de.avatar.mdp.evaluation.EvaluatedTerm;
 import de.avatar.mdp.evaluation.Evaluation;
 import de.avatar.mdp.evaluation.EvaluationSummary;
@@ -46,8 +46,9 @@ import de.avatar.mdp.evaluation.Relevance;
 import de.avatar.mdp.evaluation.RelevanceLevelType;
 import de.avatar.mdp.prmeta.EvaluationCriteriumType;
 import de.avatar.mdp.prmeta.PRClassifier;
-import de.avatar.mdp.prmeta.PRModelElement;
+import de.avatar.mdp.prmeta.PRMetaPackage;
 import de.avatar.mdp.prmeta.PRModel;
+import de.avatar.mdp.prmeta.PRModelElement;
 import de.avatar.mdp.prmeta.PRPackage;
 
 /**
@@ -59,12 +60,6 @@ import de.avatar.mdp.prmeta.PRPackage;
 @ExtendWith(ServiceExtension.class)
 @ExtendWith(ConfigurationExtension.class)
 public class PRMetaModelServiceTest {
-	
-	
-	@BeforeEach
-	public void beforeEach() {
-		System.out.println("Test");
-	}
 	
 	@Test
 	@WithFactoryConfiguration(
@@ -123,6 +118,11 @@ public class PRMetaModelServiceTest {
 		
 		PRModel prModel = metaModelService.createPRModel(createTestEvaluationSummary(), model);		
 		metaModelService.savePRModel(prModel);
+		
+		EObject eObj = repo.getEObject(PRMetaPackage.eINSTANCE.getPRModel(), prModel.getId());
+		assertThat(eObj).isNotNull();
+		
+		repo.delete(prModel);
 	}
 	
 	@Test

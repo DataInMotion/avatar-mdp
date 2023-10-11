@@ -15,8 +15,12 @@ package de.avatar.mdp.evaluation.component.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Date;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.osgi.test.common.annotation.InjectService;
@@ -27,7 +31,7 @@ import org.osgi.test.junit5.cm.ConfigurationExtension;
 import org.osgi.test.junit5.context.BundleContextExtension;
 import org.osgi.test.junit5.service.ServiceExtension;
 
-import de.avatar.mdp.apis.api.EObjectEvaluator;
+import de.avatar.mdp.apis.EObjectEvaluator;
 import de.avatar.mdp.evaluation.EvaluationSummary;
 import de.avatar.mdp.medicalrecord.MedicalHistory;
 import de.avatar.mdp.medicalrecord.MedicalRecord;
@@ -53,7 +57,7 @@ public class GDPREObjectEvaluatorTest {
 					@Property(key = "modelName", value = "ner_fake_pii_generator")
 
 			})
-	public void testSuggesterV2(@InjectService ServiceAware<EObjectEvaluator> meAware, 
+	public void testEObjEvaluator(@InjectService ServiceAware<EObjectEvaluator> meAware, 
 			@InjectService ServiceAware<MedicalRecordPackage> packAware) {
 		assertThat(meAware).isNotNull();
 		EObjectEvaluator evaluator = meAware.getService();
@@ -72,5 +76,17 @@ public class GDPREObjectEvaluatorTest {
 		EvaluationSummary summary = evaluator.evaluateEObject(medicalRecord);
 		assertThat(summary).isNotNull();
 	}
+	
+	@AfterEach
+	 public void afterEach() throws IOException {
+		 Path folder = Path.of("data/out/");
+		 Files.list(folder).forEach(p -> {
+			try {
+				if(Files.exists(p)) Files.delete(p);
+			} catch (IOException e) {
+				e.printStackTrace();
+			} 
+		 });
+	 }
 
 }

@@ -11,5 +11,10 @@ Private-Package: de.avatar.mdp.evaluation.component
 	org.gecko.emf.repository.api,\
 	org.osgi.service.component,\
 	org.osgi.util.promise,\
-	org.osgi.util.function
+	org.osgi.util.function,\
+	org.osgi.util.pushstream,\
+	org.gecko.emf.mongo.pushstream,\
+	org.gecko.emf.mongo.api,\
+	org.gecko.emf.pushstreams,\
+	org.gecko.util.pushstream
 -privatepackage: de.avatar.mdp.evaluation.component.helper

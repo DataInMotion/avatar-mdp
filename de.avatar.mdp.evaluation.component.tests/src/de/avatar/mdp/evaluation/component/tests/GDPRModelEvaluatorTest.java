@@ -15,9 +15,13 @@ package de.avatar.mdp.evaluation.component.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.gecko.emf.osgi.example.model.basic.BasicPackage;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.osgi.test.common.annotation.InjectService;
@@ -28,7 +32,7 @@ import org.osgi.test.junit5.cm.ConfigurationExtension;
 import org.osgi.test.junit5.context.BundleContextExtension;
 import org.osgi.test.junit5.service.ServiceExtension;
 
-import de.avatar.mdp.apis.api.ModelEvaluator;
+import de.avatar.mdp.apis.ModelEvaluator;
 import de.avatar.mdp.evaluation.EvaluatedTerm;
 import de.avatar.mdp.evaluation.EvaluationSummary;
 
@@ -101,5 +105,17 @@ public class GDPRModelEvaluatorTest {
 		List<EvaluatedTerm> terms = summary.getEvaluatedTerms();
 		assertThat(terms).isNotEmpty();
 	}
+	
+	@AfterEach
+	 public void afterEach() throws IOException {
+		 Path folder = Path.of("data/out/");
+		 Files.list(folder).forEach(p -> {
+			try {
+				if(Files.exists(p)) Files.delete(p);
+			} catch (IOException e) {
+				e.printStackTrace();
+			} 
+		 });
+	 }
 
 }

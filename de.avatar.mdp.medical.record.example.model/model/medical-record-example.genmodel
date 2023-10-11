@@ -9,6 +9,7 @@
   <genPackages prefix="MedicalRecord" basePackage="de.avatar.mdp" disposableProviderFactory="true"
       ecorePackage="medical-record-example.ecore#/">
     <genClasses ecoreClass="medical-record-example.ecore#//MedicalRecord">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute medical-record-example.ecore#//MedicalRecord/id"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference medical-record-example.ecore#//MedicalRecord/patientInfo"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference medical-record-example.ecore#//MedicalRecord/emergencyContact"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference medical-record-example.ecore#//MedicalRecord/medicalHistory"/>

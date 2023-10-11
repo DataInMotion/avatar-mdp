@@ -9,22 +9,18 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package de.avatar.mdp.apis.api;
-
-import org.eclipse.emf.ecore.EObject;
-import org.osgi.annotation.versioning.ProviderType;
-
-import de.avatar.mdp.evaluation.EvaluationSummary;
+package de.avatar.mdp.apis.config;
 
 /**
- * This service provider should be responsible for evaluating the instance of a model, 
- * so an EObject
  * 
  * @author ilenia
- * @since Oct 6, 2023
+ * @since Oct 11, 2023
  */
-@ProviderType
-public interface EObjectEvaluator {
+public @interface SuggesterRetrainerConfig {
+	
+	String pythonVersion() default "3";
+	String pyScriptBasePath() default "./py/"; 
+	String basePath() default "./";
+	String modelName() default "";
 
-	EvaluationSummary evaluateEObject(EObject eObject);
 }

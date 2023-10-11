@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012 - 2023 Data In Motion and others.
+ * Copyright (c) 2012 - 2018 Data In Motion and others.
  * All rights reserved. 
  * 
  * This program and the accompanying materials are made available under the terms of the 
@@ -9,22 +9,21 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package de.avatar.mdp.apis.api;
+package de.avatar.mdp.apis;
 
-import java.util.List;
-import java.util.Map;
-
+import org.eclipse.emf.ecore.EPackage;
 import org.osgi.annotation.versioning.ProviderType;
 
-import de.avatar.mdp.evaluation.Relevance;
+import de.avatar.mdp.evaluation.EvaluationSummary;
 
 /**
- * 
+ * This service provider should be responsible of evaluating a meta model
  * @author ilenia
- * @since Aug 3, 2023
+ * @since Oct 6, 2023
  */
 @ProviderType
-public interface ModelSuggesterRetrainer {
+public interface ModelEvaluator{
 
-	void retrainModelSuggester(Map<String, List<Relevance>> relevanceMap);
+	EvaluationSummary evaluateModel(EPackage ePackage);
+
 }
