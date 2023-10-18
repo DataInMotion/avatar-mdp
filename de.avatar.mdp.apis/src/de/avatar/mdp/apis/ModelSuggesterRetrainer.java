@@ -17,6 +17,7 @@ import java.util.Map;
 import org.osgi.annotation.versioning.ProviderType;
 
 import de.avatar.mdp.evaluation.Relevance;
+import org.osgi.util.promise.Promise;
 
 /**
  * 
@@ -26,5 +27,5 @@ import de.avatar.mdp.evaluation.Relevance;
 @ProviderType
 public interface ModelSuggesterRetrainer {
 
-	void retrainModelSuggester(Map<String, List<Relevance>> relevanceMap);
+	Promise<Boolean> retrainModelSuggester(Map<String, List<Relevance>> relevanceMap);
 }

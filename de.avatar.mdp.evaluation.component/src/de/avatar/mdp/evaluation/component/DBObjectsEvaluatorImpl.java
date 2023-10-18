@@ -11,16 +11,24 @@
  */
 package de.avatar.mdp.evaluation.component;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -71,11 +79,6 @@ public class DBObjectsEvaluatorImpl implements DBObjectsEvaluator {
 	@Activate
 	public void activate(DBEvaluatorConfig config) {
 		this.config = config;
-		factory.submit(() -> {
-			evaluate();
-			return true;
-		}).onSuccess(t -> LOGGER.info("Finished evaluating db EObjects!"))
-		.onFailure(t -> LOGGER.log(Level.SEVERE, String.format("Something went wrong when evaluating EObjects from db"), t));		
 	}
 
 	/* 
@@ -84,10 +87,33 @@ public class DBObjectsEvaluatorImpl implements DBObjectsEvaluator {
 	 */
 	@Override
 	public void evaluate() {
-		String[] eClassURIsToEvaluate = config.eClass_uris_to_evaluate();
-		for(String eClassURIToEvaluate : eClassURIsToEvaluate) {
-			doEvaluate(eClassURIToEvaluate);
-		}
+		factory.submit(() -> {
+			String[] eClassURIsToEvaluate = config.eClass_uris_to_evaluate();
+			for(String eClassURIToEvaluate : eClassURIsToEvaluate) {
+				doEvaluate(eClassURIToEvaluate);
+			}
+			return true;
+		});
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see de.avatar.mdp.apis.DBObjectsEvaluator#getEvaluationSummariesForEPackage()
+	 */
+	@Override
+	public List<EvaluationSummary> getEvaluationSummariesForEPackage(EPackage ePackage) {
+		Objects.requireNonNull(ePackage, "Cannot retrieve EvaluationSuammry for null EPackage");
+		List<EvaluationSummary> summaries = new ArrayList<>();
+		try {
+			Stream<Path> evaluationsFilePaths = getPathsByEPackageName(ePackage.getName());
+			evaluationsFilePaths.forEach(p -> {
+				EvaluationSummary summary = loadEvaluationSummaryFromJson(p);
+				if(summary != null) summaries.add(summary);
+			});	
+		} catch(IOException e) {
+			LOGGER.log(Level.SEVERE, String.format("IOException when retrieving EvaluationSuammary for EPackage %s", ePackage.getName()), e);
+		}			
+		return summaries;
 	}
 
 	private void doEvaluate(String eClassURIToEvaluate) {
@@ -139,9 +165,8 @@ public class DBObjectsEvaluatorImpl implements DBObjectsEvaluator {
 	private void saveEvaluationSummaryAsJson(EvaluationSummary summary, EClass eClass, EObject eObj) {
 		ResourceSet resSet = rsFactory.getService();
 		try {
-			String repoName = config.repositorySO_target().replace("(repo_id=", "");
-			repoName = repoName.replace(")", "");
-			String outFileName = config.evaluation_out_folder() + repoName + "_" + eClass.getName() + "_" + EcoreUtil.getID(eObj) + ".json";
+			String repoName = extractEvaluatorRepoName();
+			String outFileName = config.evaluation_out_folder() + repoName + "_" + eClass.getEPackage().getName() + "_" + eClass.getName() + "_" + EcoreUtil.getID(eObj) + ".json";
 			Resource resource = resSet.createResource(URI.createFileURI(outFileName), "application/json");
 			resource.getContents().add(summary);
 			resource.save(null);
@@ -153,6 +178,38 @@ public class DBObjectsEvaluatorImpl implements DBObjectsEvaluator {
 		}
 	}
 
+	private EvaluationSummary loadEvaluationSummaryFromJson(Path path) {
+		ResourceSet resSet = rsFactory.getService();
+		try {
+			Resource resource = resSet.getResource(URI.createFileURI(path.toString()), true);
+			resource.load(null);
+			if(resource.getContents() != null && !resource.getContents().isEmpty()) {
+				if(resource.getContents().get(0) instanceof EvaluationSummary summary) return summary;
+				else LOGGER.log(Level.SEVERE, String.format("Loaded resource from file %s is not of type EvaluationSummary"), path.toString());
+			} else {
+				LOGGER.log(Level.SEVERE, String.format("Loaded resource from file %s has no content", path.toString()));
+			}
+		} catch(IOException e) {
+			LOGGER.log(Level.SEVERE, String.format("IOException when loading EvaluationSummary from file %s", path.toString()), e);
+		}
+		finally {
+			rsFactory.ungetService(resSet);
+		}
+		return null;
+	}
+
+	private Stream<Path> getPathsByEPackageName(String ePackageName) throws IOException{
+		Path folder = Path.of(config.evaluation_out_folder());
+		String repoName = extractEvaluatorRepoName();
+		return Files.list(folder).filter(p -> p.toString().contains(repoName + "_" + ePackageName));
+	}
+
+	private String extractEvaluatorRepoName() {
+		String repoName = config.repositorySO_target().replace("(repo_id=", "");
+		repoName = repoName.replace(")", "");
+		return repoName;
+	}
+
 	private static Map<Object, Object> getLoadOptions(){
 		Map<Object, Object> loadOptions = new HashMap<>();
 		loadOptions.put(Options.OPTION_BATCH_SIZE, Integer.valueOf(600));
@@ -160,5 +217,7 @@ public class DBObjectsEvaluatorImpl implements DBObjectsEvaluator {
 		loadOptions.put(Options.OPTION_PROXY_ATTRIBUTES, true);
 		return loadOptions;
 	}
+
+
 
 }

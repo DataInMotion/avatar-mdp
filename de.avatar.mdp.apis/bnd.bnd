@@ -5,4 +5,5 @@ Bundle-Version: 1.0.0.SNAPSHOT
 
 -buildpath: \
 	de.avatar.mdp.evaluation.model;version=latest,\
-	de.avatar.mdp.privacy.related.meta.model;version=latest
+	de.avatar.mdp.privacy.related.meta.model;version=latest,\
+	org.osgi.util.promise

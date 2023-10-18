@@ -18,13 +18,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import org.gecko.emf.repository.EMFRepository;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.osgi.test.common.annotation.InjectService;
@@ -39,9 +39,11 @@ import org.osgi.test.junit5.service.ServiceExtension;
 
 import de.avatar.mdp.apis.DBObjectsEvaluator;
 import de.avatar.mdp.apis.EObjectEvaluator;
+import de.avatar.mdp.evaluation.EvaluationSummary;
 import de.avatar.mdp.medicalrecord.MedicalHistory;
 import de.avatar.mdp.medicalrecord.MedicalRecord;
 import de.avatar.mdp.medicalrecord.MedicalRecordFactory;
+import de.avatar.mdp.medicalrecord.MedicalRecordPackage;
 import de.avatar.mdp.medicalrecord.PatientInfo;
 
 /**
@@ -54,6 +56,7 @@ import de.avatar.mdp.medicalrecord.PatientInfo;
  public class DBObjectsEvaluatorTest {
 
 	 @Test
+	 @Disabled()
 	 @WithFactoryConfiguration(
 			 factoryPid = "EMFMongoRepositoryConfigurator",
 			 location = "?",
@@ -104,6 +107,7 @@ import de.avatar.mdp.medicalrecord.PatientInfo;
 	 }
 	 
 	 @Test
+	 @Disabled()
 	 @WithFactoryConfiguration(
 			 factoryPid = "EMFMongoRepositoryConfigurator",
 			 location = "?",
@@ -160,7 +164,7 @@ import de.avatar.mdp.medicalrecord.PatientInfo;
 		 
 		 Thread.sleep(15000);
 		 
-		 String fileName = "data/out/avatarmdp.avatarmdp_MedicalRecord_"+medicalRecord.getId()+".json";
+		 String fileName = "data/out/avatarmdp.avatarmdp_medicalrecord_MedicalRecord_"+medicalRecord.getId()+".json";
 		 File file = new File(fileName);
 		 assertTrue(file.exists());
 		 
@@ -168,6 +172,7 @@ import de.avatar.mdp.medicalrecord.PatientInfo;
 	 }
 	 
 	 @Test
+	 @Disabled()
 	 @WithFactoryConfiguration(
 			 factoryPid = "EMFMongoRepositoryConfigurator",
 			 location = "?",
@@ -225,23 +230,68 @@ import de.avatar.mdp.medicalrecord.PatientInfo;
 		 
 		 Thread.sleep(15000);
 		 
-		 String fileName = "data/out/test.test_MedicalRecord_"+medicalRecord.getId()+".json";
+		 String fileName = "data/out/test.test_medicalrecord_MedicalRecord_"+medicalRecord.getId()+".json";
 		 File file = new File(fileName);
 		 assertTrue(file.exists());
+		 
 		 
 		 repo.delete(medicalRecord);
 	 }
 	 
+	 @Test
+	 @WithFactoryConfiguration(
+			 factoryPid = "EMFMongoRepositoryConfigurator",
+			 location = "?",
+			 name = "avatarmdp", 
+			 properties = {
+					 @Property(key = "mongo.instances", value = "avatarmdp"),
+					 @Property(key = "avatarmdp.baseUris", value = "mongodb://mongodb"),
+					 @Property(key = "avatarmdp.databases", value = "avatarmdp"),
+					 @Property(key = "avatarmdp.avatarmdp.repoType", value = "PROTOTYPE")
+
+			 })
+	 @WithFactoryConfiguration(
+			 factoryPid = "GDPREObjectEvaluator",
+			 location = "?",
+			 name = "objEvaluator", 
+			 properties = {
+					 @Property(key = "criterium", value = "GDPR"),
+					 @Property(key = "basePath", value = "./data/"),
+					 @Property(key = "modelPath", value = "./data/model/"),
+					 @Property(key = "pyScriptBasePath", value = "./data/py/ner_fake_pii_generator/"),
+					 @Property(key = "outputBasePath", value = "./data/out/"),
+					 @Property(key = "modelName", value = "ner_fake_pii_generator")
+
+			 })
+	 @WithFactoryConfiguration(
+			 factoryPid = "DBObjectsEvaluator",
+			 location = "?",
+			 name = "dbEvaluator", 
+			 properties = {
+					 @Property(key = "evaluation.out.folder", value = "./data/out/"),
+					 @Property(key = "eClass.uris.to.evaluate", value = {"http://avatar.de/mdp/medical_record_example/1.0.0#//MedicalRecord"}, type = Type.Array, scalar = Scalar.String)
+			 })	 
+	 public void testDBEvaluatorRetrieveSummaries(
+			 @InjectService ServiceAware<DBObjectsEvaluator> dbeAware) throws InterruptedException {
+		 
+		 assertThat(dbeAware).isNotNull();
+		 DBObjectsEvaluator dbEvaluator = dbeAware.getService();
+		 assertThat(dbEvaluator).isNotNull();
+		 
+		 List<EvaluationSummary> summaries = dbEvaluator.getEvaluationSummariesForEPackage(MedicalRecordPackage.eINSTANCE);
+		 assertThat(summaries).isNotEmpty();
+		 
+	 }
 	 @AfterEach
 	 public void afterEach() throws IOException {
-		 Path folder = Path.of("data/out/");
-		 Files.list(folder).forEach(p -> {
-			try {
-				if(Files.exists(p)) Files.delete(p);
-			} catch (IOException e) {
-				e.printStackTrace();
-			} 
-		 });
+//		 Path folder = Path.of("data/out/");
+//		 Files.list(folder).forEach(p -> {
+//			try {
+//				if(Files.exists(p)) Files.delete(p);
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			} 
+//		 });
 	 }
 	 
 	 

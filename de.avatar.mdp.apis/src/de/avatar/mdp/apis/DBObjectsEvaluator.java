@@ -11,7 +11,12 @@
  */
 package de.avatar.mdp.apis;
 
+import java.util.List;
+
+import org.eclipse.emf.ecore.EPackage;
 import org.osgi.annotation.versioning.ProviderType;
+
+import de.avatar.mdp.evaluation.EvaluationSummary;
 
 /**
  * This service provider should be responsible of evaluating EObjects from a db
@@ -26,5 +31,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DBObjectsEvaluator {
 	
 	void evaluate();
+	
+	List<EvaluationSummary> getEvaluationSummariesForEPackage(EPackage ePackage);
 
 }

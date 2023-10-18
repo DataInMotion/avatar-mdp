@@ -74,25 +74,35 @@ public class GDPREObjectEvaluator implements EObjectEvaluator {
 		List<EvaluatedTerm> termsToBeEvaluated = prepareEvaluatedTerms(eObject);
 
 		ObjectMapper objectMapper = new ObjectMapper();
-        try {
-        	Map<String, List<String>> featureNameDocMap = new LinkedHashMap<>();
-        	termsToBeEvaluated
-        		.forEach(t -> featureNameDocMap.put(t.getElementClassifierName().concat("::").concat(t.getEvaluatedModelElement().getName()), 
-        			t.getEvaluations().stream().map(e -> e.getInput()).toList()));
-            String jsonDocMap = objectMapper.writeValueAsString(featureNameDocMap);
-            LocalDateTime date = LocalDateTime.now();
-            String dateStr = date.format(DATE_TIME_FORMATTER);
-            String outFileName = config.outputBasePath() + eObject.eClass().getName() + "_" + config.modelName() + "_" + dateStr +".json";
-            EvaluationHelper.executeExternalCmd(LOGGER, "python"+config.pythonVersion(), config.pyScriptBasePath() + config.modelName()+PREDICTION_SCRIPT_SUFFIX, config.modelPath(), outFileName, jsonDocMap);
-            Map<String,Object> result = objectMapper.readValue(new File(outFileName), LinkedHashMap.class);
-            EvaluationSummary summary = createEvaluationSummary(result, termsToBeEvaluated);
-            return summary;
-        } catch (IOException e) {
+		try {
+			Map<String, List<String>> featureNameDocMap = new LinkedHashMap<>();
+			
+			termsToBeEvaluated
+			.forEach(t -> {
+				String mapKey = t.getElementClassifierName().concat("::").concat(t.getEvaluatedModelElement().getName());
+				if(featureNameDocMap.containsKey(mapKey)) {
+					List<String> existingList = featureNameDocMap.get(mapKey);
+					List<String> newList = new ArrayList<>(existingList);
+					newList.addAll(t.getEvaluations().stream().map(e -> e.getInput()).toList());
+					featureNameDocMap.put(mapKey, newList);
+				} else {
+					featureNameDocMap.put(mapKey, t.getEvaluations().stream().map(e -> e.getInput()).toList());
+				}
+			});
+			String jsonDocMap = objectMapper.writeValueAsString(featureNameDocMap);
+			LocalDateTime date = LocalDateTime.now();
+			String dateStr = date.format(DATE_TIME_FORMATTER);
+			String outFileName = config.outputBasePath() + eObject.eClass().getName() + "_" + config.modelName() + "_" + dateStr +".json";
+			EvaluationHelper.executeExternalCmd(LOGGER, "python"+config.pythonVersion(), config.pyScriptBasePath() + config.modelName()+PREDICTION_SCRIPT_SUFFIX, config.modelPath(), outFileName, jsonDocMap);
+			Map<String,Object> result = objectMapper.readValue(new File(outFileName), LinkedHashMap.class);
+			EvaluationSummary summary = createEvaluationSummary(result, termsToBeEvaluated);
+			return summary;
+		} catch (IOException e) {
 			LOGGER.log(Level.SEVERE, String.format("Exception while making GDPR predicitons for EObject %s", eObject.eClass().getName()), e);
-        }
+		}
 		return null;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private EvaluationSummary createEvaluationSummary(Map<String,Object> modelPredictions, List<EvaluatedTerm> termsList) {
 		EvaluationSummary summary = MDPEvaluationFactory.eINSTANCE.createEvaluationSummary();
@@ -100,14 +110,14 @@ public class GDPREObjectEvaluator implements EObjectEvaluator {
 		summary.setEvaluationModelUsed(config.modelName());
 		summary.setEvaluationTimestamp(System.currentTimeMillis());
 		modelPredictions.forEach((k,v) -> {
-			EvaluatedTerm evaluatedTerm = termsList.stream().filter(t -> t.getElementClassifierName().concat("::").concat(t.getEvaluatedModelElement().getName()).equals(k)).findFirst().orElse(null);
-			if(evaluatedTerm == null) {
+			List<EvaluatedTerm> evaluatedTerms = termsList.stream().filter(t -> t.getElementClassifierName().concat("::").concat(t.getEvaluatedModelElement().getName()).equals(k)).toList();
+			if(evaluatedTerms.isEmpty()) {
 				LOGGER.severe(String.format("No matching term found for evaluated %s", k));
 				throw new IllegalStateException(String.format("No matching term found for evaluated %s", k));
 			}
 			Map<String, Map<String, List<String>>> predictions = (Map<String, Map<String, List<String>>>) v;
 			predictions.forEach((doc, pred) -> {
-				Evaluation evaluation = evaluatedTerm.getEvaluations().stream().filter(e -> e.getInput().equals(doc)).findFirst().orElse(null);
+				Evaluation evaluation = evaluatedTerms.stream().map(t -> t.getEvaluations()).flatMap(el -> el.stream()).filter(e -> e.getInput().equals(doc)).findFirst().orElse(null);
 				if(evaluation == null) {
 					LOGGER.severe(String.format("No matching evaluation doc found for evaluated %s", doc));
 					throw new IllegalStateException(String.format("No matching evaluation doc found for evaluated %s", doc));
@@ -118,7 +128,7 @@ public class GDPREObjectEvaluator implements EObjectEvaluator {
 					} 
 				});
 			});
-			summary.getEvaluatedTerms().add(evaluatedTerm);
+			summary.getEvaluatedTerms().addAll(evaluatedTerms);
 		});
 		return summary;		
 	}
@@ -138,6 +148,7 @@ public class GDPREObjectEvaluator implements EObjectEvaluator {
 		if(elementValue == null) return Collections.emptyList();
 		List<EvaluatedTerm> terms = new ArrayList<>();
 		List<String> docs = new ArrayList<>();
+		//		This is the case of simple type attributes, like String, EDate, numbers, etc.
 		if(feature.getEType() instanceof EDataType eDataType) {
 			if(feature.isMany()) {
 				List<?> list = (List<?>)elementValue;
@@ -156,18 +167,33 @@ public class GDPREObjectEvaluator implements EObjectEvaluator {
 				term.getEvaluations().add(evaluation);
 			});
 			terms.add(term);
+			//			This is the case of complex objects, like references to other classes, e.g. Person::Address
 		} else if(feature.getEType() instanceof EClass eClass) {
-			eClass.getEAllAttributes().forEach(att -> {
-				terms.addAll(doCreateEvaluatedTerm(att, eClass.getName(), ((EObject)elementValue).eGet(att)));
-			});
-			eClass.getEAllReferences().forEach(ref -> {
-				terms.addAll(doCreateEvaluatedTerm(ref, eClass.getName(), ((EObject)elementValue).eGet(ref)));
-			});
+			//			Like a person having a list of addresses
+			if(feature.isMany()) {
+				//				This would be the list of addresses
+				List<?> list = (List<?>)elementValue;
+				for (Object item : list) {
+					eClass.getEAllAttributes().forEach(att -> {
+						terms.addAll(doCreateEvaluatedTerm(att, eClass.getName(), ((EObject)item).eGet(att)));
+					});
+					eClass.getEAllReferences().forEach(ref -> {
+						terms.addAll(doCreateEvaluatedTerm(ref, eClass.getName(), ((EObject)item).eGet(ref)));
+					});
+				}
+			} else {
+				eClass.getEAllAttributes().forEach(att -> {
+					terms.addAll(doCreateEvaluatedTerm(att, eClass.getName(), ((EObject)elementValue).eGet(att)));
+				});
+				eClass.getEAllReferences().forEach(ref -> {
+					terms.addAll(doCreateEvaluatedTerm(ref, eClass.getName(), ((EObject)elementValue).eGet(ref)));
+				});
+			}			
 		} else {
 			LOGGER.warning(String.format("Feature %s eType is not of type EDataType, but is %s. Do not know how to convert it.", feature.getName(), feature.getEType()));
 		}
 
-		
+
 		return terms;
 	}
 

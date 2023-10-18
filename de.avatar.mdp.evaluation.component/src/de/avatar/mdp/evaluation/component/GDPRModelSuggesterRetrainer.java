@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.util.promise.Promise;
 import org.osgi.util.promise.PromiseFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,8 +57,8 @@ public class GDPRModelSuggesterRetrainer implements ModelSuggesterRetrainer {
 	 * @see de.avatar.mdp.apis.api.ModelSuggesterRetrainer#retrainModelSuggester(java.util.Map)
 	 */
 	@Override
-	public void retrainModelSuggester(Map<String, List<Relevance>> relevanceMap) {
-		factory.submit(() -> {
+	public Promise<Boolean> retrainModelSuggester(Map<String, List<Relevance>> relevanceMap) {
+		return factory.submit(() -> {
 			ObjectMapper objectMapper = new ObjectMapper();
 			try {
 				Map<String, Map<String, String>> docMap = createDocMap(relevanceMap);
@@ -68,8 +69,7 @@ public class GDPRModelSuggesterRetrainer implements ModelSuggesterRetrainer {
 				return false;
 			}
 			return true;
-		}).onSuccess(s -> LOGGER.info(String.format("Model %s succesfully retrained", config.modelName())))
-		.onFailure(t -> LOGGER.log(Level.SEVERE, String.format("Something went wrong during retraining of %s model", config.modelName()), t));	
+		});
 	}
 
 	/**

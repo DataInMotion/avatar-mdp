@@ -13,6 +13,7 @@ package de.avatar.mdp.evaluation.component.helper;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ProcessBuilder.Redirect;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,6 +27,8 @@ public class EvaluationHelper {
 
 	public static void executeExternalCmd(Logger LOGGER, String... command) {
 		ProcessBuilder pb = new ProcessBuilder(command);
+		pb.redirectOutput(Redirect.INHERIT);
+		pb.redirectError(Redirect.INHERIT);
 		try {
 			Process process = pb.start();
 			process.waitFor();

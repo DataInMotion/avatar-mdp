@@ -20,6 +20,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
 
+import org.gecko.emf.osgi.example.model.basic.Address;
+import org.gecko.emf.osgi.example.model.basic.BasicFactory;
+import org.gecko.emf.osgi.example.model.basic.Contact;
+import org.gecko.emf.osgi.example.model.basic.Person;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -74,6 +78,40 @@ public class GDPREObjectEvaluatorTest {
 		medicalHistory.setVaccinations("I got covid-19 vaccination");
 		medicalRecord.setMedicalHistory(medicalHistory);
 		EvaluationSummary summary = evaluator.evaluateEObject(medicalRecord);
+		assertThat(summary).isNotNull();
+	}
+	
+	@Test
+	@WithFactoryConfiguration(
+			factoryPid = "GDPREObjectEvaluator",
+			location = "?",
+			name = "test", 
+			properties = {
+					@Property(key = "basePath", value = "./data/"),
+					@Property(key = "modelPath", value = "./data/model/"),
+					@Property(key = "pyScriptBasePath", value = "./data/py/ner_fake_pii_generator/"),
+					@Property(key = "outputBasePath", value = "./data/out/"),
+					@Property(key = "modelName", value = "ner_fake_pii_generator")
+
+			})
+	public void testEObjEvaluatorWithManyRef(@InjectService ServiceAware<EObjectEvaluator> meAware) {
+		assertThat(meAware).isNotNull();
+		EObjectEvaluator evaluator = meAware.getService();
+		assertThat(evaluator).isNotNull();
+		
+		Person person = BasicFactory.eINSTANCE.createPerson();
+		Address a1 = BasicFactory.eINSTANCE.createAddress();
+		a1.setStreet("street1");
+		person.setAddress(a1); 
+		
+		Contact c1 = BasicFactory.eINSTANCE.createContact();
+		c1.setValue("c1");
+		Contact c2 = BasicFactory.eINSTANCE.createContact();
+		c2.setValue("c2");
+		person.getContact().add(c1);
+		person.getContact().add(c2);
+
+		EvaluationSummary summary = evaluator.evaluateEObject(person);
 		assertThat(summary).isNotNull();
 	}
 	
